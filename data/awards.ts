@@ -12,26 +12,28 @@ export const awards: Award[] = [
     title: "全国二等奖",
     event: "RoboMaster 2026 步兵对抗赛",
     level: "national",
-    certificate: "/images/awards/certificate-1.jpg",
+    certificate: "/images/awards/certificate-4.jpg",
   },
   {
     year: "2026",
     title: "全国三等奖",
     event: "RoboMaster 2026 3v3 步兵机器人组",
     level: "national",
-    certificate: "/images/awards/certificate-2.jpg",
+    certificate: "/images/awards/certificate-3.jpg",
   },
   {
     year: "2026",
     title: "全国三等奖",
     event: "RoboMaster 2026 3v3 英雄机器人组",
     level: "national",
+    certificate: "/images/awards/certificate-2.jpg",
   },
   {
     year: "2026",
     title: "优秀奖",
     event: "RoboMaster 2026 3v3 哨兵机器人组",
     level: "national",
+    certificate: "/images/awards/certificate-1.jpg",
   },
 ];
 

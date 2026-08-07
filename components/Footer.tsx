@@ -2,7 +2,6 @@
 
 const socialLinks = [
   { label: "GitHub", href: "https://github.com/totrytakeoff/RM2026/tree/new/basic_framework" },
-  { label: "Bilibili", href: "#" },
   { label: "QQ群", href: "#" },
 ];
 

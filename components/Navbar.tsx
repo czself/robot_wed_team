@@ -8,6 +8,7 @@ const navLinks = [
   { label: "Robots", href: "#robots" },
   { label: "Tech", href: "#tech" },
   { label: "Awards", href: "#competition" },
+  { label: "留言墙", href: "/wall" },
   { label: "Join Us", href: "#join" },
 ];
 
@@ -53,6 +54,13 @@ export default function Navbar() {
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-rm-red group-hover:w-full transition-all duration-300" />
             </a>
           ))}
+          <a
+            href="/wall"
+            className="px-5 py-2 border border-rm-red/40 hover:border-rm-red text-rm-red hover:bg-rm-red/10 text-sm font-medium rounded transition-colors flex items-center gap-1.5"
+          >
+            <span>留言墙</span>
+            <span className="text-[10px] opacity-70">💬</span>
+          </a>
           <a
             href="https://www.robomaster.com/zh-CN"
             target="_blank"
@@ -111,6 +119,13 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="/wall"
+                onClick={() => setMobileOpen(false)}
+                className="px-5 py-2 border border-rm-red/40 hover:border-rm-red text-rm-red hover:bg-rm-red/10 text-sm font-medium rounded transition-colors text-center"
+              >
+                留言墙 💬
+              </a>
               <a
                 href="https://www.robomaster.com/zh-CN"
                 target="_blank"

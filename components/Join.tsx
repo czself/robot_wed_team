@@ -80,7 +80,7 @@ export default function Join() {
             加入我们 →
           </a>
           <p className="mt-6 text-rm-gray text-sm">
-            QQ群：XXXXXXXX | 邮箱：robotics@university.edu.cn
+            QQ群：XXXXXXXX
           </p>
         </motion.div>
       </div>
