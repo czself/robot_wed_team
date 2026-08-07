@@ -54,6 +54,14 @@ export default function Navbar() {
             </a>
           ))}
           <a
+            href="https://www.robomaster.com/zh-CN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2 border border-rm-blue/40 hover:border-rm-blue text-rm-blue hover:bg-rm-blue/10 text-sm font-medium rounded transition-colors"
+          >
+            RM 官网 ↗
+          </a>
+          <a
             href="#join"
             className="px-5 py-2 bg-rm-red hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
           >
@@ -103,6 +111,15 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="https://www.robomaster.com/zh-CN"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="px-5 py-2 border border-rm-blue/40 hover:border-rm-blue text-rm-blue hover:bg-rm-blue/10 text-sm font-medium rounded transition-colors text-center"
+              >
+                RM 官网 ↗
+              </a>
               <a
                 href="#join"
                 onClick={() => setMobileOpen(false)}

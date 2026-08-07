@@ -80,14 +80,23 @@ export default function Team() {
                 )}
               </AnimatePresence>
 
-              <div className="mt-3 text-xs text-rm-gray flex items-center gap-1">
-                <motion.span
-                  animate={{ rotate: expandedId === group.id ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
+              <div className="mt-3 flex items-center justify-between text-xs">
+                <span className="text-rm-gray flex items-center gap-1">
+                  <motion.span
+                    animate={{ rotate: expandedId === group.id ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    ▼
+                  </motion.span>
+                  {expandedId === group.id ? "收起" : "展开技能树"}
+                </span>
+                <a
+                  href="#join"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-rm-red/80 hover:text-rm-red transition-colors"
                 >
-                  ▼
-                </motion.span>
-                {expandedId === group.id ? "收起" : "展开技能树"}
+                  加入 →
+                </a>
               </div>
             </motion.div>
           ))}

@@ -46,11 +46,21 @@ export default function Footer() {
                 <a
                   key={link.label}
                   href={link.href}
+                  target={link.href.startsWith("http") ? "_blank" : undefined}
+                  rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="block text-sm text-rm-gray hover:text-white transition-colors"
                 >
                   {link.label}
                 </a>
               ))}
+              <a
+                href="https://www.robomaster.com/zh-CN"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-sm text-rm-blue hover:text-white transition-colors"
+              >
+                RoboMaster 官网 ↗
+              </a>
             </div>
           </div>
         </div>

@@ -372,6 +372,19 @@ export default function Robots() {
                       </motion.span>
                     ))}
                   </div>
+
+                  <motion.a
+                    href="https://www.robomaster.com/zh-CN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="mt-8 inline-flex items-center gap-2 text-sm text-rm-blue/80 hover:text-rm-blue border-b border-rm-blue/30 hover:border-rm-blue pb-1 transition-colors group/link"
+                  >
+                    查看赛事规则
+                    <span className="group-hover/link:translate-x-1 transition-transform">↗</span>
+                  </motion.a>
                 </div>
               </div>
             </div>

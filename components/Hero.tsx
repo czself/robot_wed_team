@@ -178,6 +178,14 @@ export default function Hero() {
           >
             加入我们
           </a>
+          <a
+            href="https://www.robomaster.com/zh-CN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3.5 border border-rm-blue/40 hover:border-rm-blue text-rm-blue hover:bg-rm-blue/10 font-medium rounded transition-all hover:shadow-[0_0_24px_rgba(0,200,255,0.25)]"
+          >
+            RM 官网 ↗
+          </a>
         </motion.div>
       </div>
 

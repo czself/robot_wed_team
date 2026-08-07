@@ -175,6 +175,23 @@ export default function TechTree() {
           ))}
         </div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 1, duration: 0.6 }}
+        className="mt-16 text-center"
+      >
+        <a
+          href="https://www.robomaster.com/zh-CN"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-rm-blue/80 hover:text-rm-blue border-b border-rm-blue/30 hover:border-rm-blue pb-1 transition-colors group"
+        >
+          了解 RoboMaster 赛事技术体系
+          <span className="group-hover:translate-x-1 transition-transform">↗</span>
+        </a>
+      </motion.div>
     </section>
   );
 }

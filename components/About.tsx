@@ -6,10 +6,10 @@ import { motion, useInView } from "framer-motion";
 import CountUp from "react-countup";
 
 const stats = [
-  { value: 20, suffix: "+", label: "队员" },
-  { value: 1, suffix: "年", label: "建队即国二" },
-  { value: 2, suffix: "项", label: "国家级奖项" },
-  { value: 168, suffix: "MHz", label: "主频" },
+  { value: 20, suffix: "+", label: "队员", href: "#team" },
+  { value: 1, suffix: "年", label: "建队即国二", href: "#competition" },
+  { value: 2, suffix: "项", label: "国家级奖项", href: "https://www.robomaster.com/zh-CN", external: true },
+  { value: 168, suffix: "MHz", label: "主频", href: "#tech" },
 ];
 
 export default function About() {
@@ -43,11 +43,12 @@ export default function About() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10 items-center mb-20">
-          <motion.div
+          <motion.a
+            href="#team"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="relative aspect-square max-w-sm mx-auto w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(217,4,41,0.5)] group"
+            className="relative aspect-square max-w-sm mx-auto w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(217,4,41,0.5)] group block"
           >
             <Image
               src="/images/gallery/gallery-17.jpg"
@@ -59,24 +60,32 @@ export default function About() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
             <div className="absolute left-4 top-4 w-8 h-8 border-l border-t border-rm-red/70" />
             <div className="absolute right-4 bottom-4 w-8 h-8 border-r border-b border-rm-blue/70" />
-            <div className="absolute bottom-5 left-5 right-5">
-              <p className="text-[10px] tracking-[0.4em] text-rm-blue/80 font-mono uppercase mb-1">
-                Est. 2025
-              </p>
-              <p className="text-white font-black text-xl tracking-wider">
-                YZ CONTROL
-              </p>
+            <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-2">
+              <div>
+                <p className="text-[10px] tracking-[0.4em] text-rm-blue/80 font-mono uppercase mb-1">
+                  Est. 2025
+                </p>
+                <p className="text-white font-black text-xl tracking-wider">
+                  YZ CONTROL
+                </p>
+              </div>
+              <span className="text-[10px] text-white/70 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                查看团队 →
+              </span>
             </div>
-          </motion.div>
+          </motion.a>
 
           <div className="grid grid-cols-2 gap-4">
             {stats.map((stat, index) => (
-              <motion.div
+              <motion.a
                 key={stat.label}
+                href={stat.href}
+                target={stat.external ? "_blank" : undefined}
+                rel={stat.external ? "noopener noreferrer" : undefined}
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.3 + index * 0.12, duration: 0.6 }}
-                className="relative text-left p-6 md:p-7 rounded-2xl border border-white/5 bg-white/[0.02] card-hover overflow-hidden group"
+                className="relative text-left p-6 md:p-7 rounded-2xl border border-white/5 bg-white/[0.02] card-hover overflow-hidden group block cursor-pointer"
               >
                 <div
                   className={`absolute -top-6 -right-6 w-16 h-16 rounded-full blur-2xl opacity-40 group-hover:opacity-70 transition-opacity ${
@@ -100,12 +109,15 @@ export default function About() {
                       "0"
                     )}
                   </div>
-                  <p className="text-rm-gray text-sm tracking-wider uppercase">
+                  <p className="text-rm-gray text-sm tracking-wider uppercase flex items-center gap-1.5">
                     {stat.label}
+                    <span className="text-rm-gray/40 group-hover:text-rm-red group-hover:translate-x-0.5 transition-all">
+                      {stat.external ? "↗" : "→"}
+                    </span>
                   </p>
                 </div>
                 <span className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 bg-gradient-to-r from-rm-red to-rm-blue" />
-              </motion.div>
+              </motion.a>
             ))}
           </div>
         </div>

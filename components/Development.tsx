@@ -5,13 +5,13 @@ import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 
 const steps = [
-  { label: "Idea", labelCn: "创意", icon: "💡" },
-  { label: "CAD", labelCn: "建模", icon: "📐" },
-  { label: "PCB", labelCn: "电路", icon: "🔌" },
-  { label: "Solder", labelCn: "焊接", icon: "🔥" },
-  { label: "Code", labelCn: "编码", icon: "⌨️" },
-  { label: "PID Tuning", labelCn: "调参", icon: "🔧" },
-  { label: "3v3 Battle", labelCn: "比赛", icon: "🏆" },
+  { label: "Idea", labelCn: "创意", icon: "💡", target: "#about" },
+  { label: "CAD", labelCn: "建模", icon: "📐", target: "#team" },
+  { label: "PCB", labelCn: "电路", icon: "🔌", target: "#team" },
+  { label: "Solder", labelCn: "焊接", icon: "🔥", target: "#team" },
+  { label: "Code", labelCn: "编码", icon: "⌨️", target: "#tech" },
+  { label: "PID Tuning", labelCn: "调参", icon: "🔧", target: "#tech" },
+  { label: "3v3 Battle", labelCn: "比赛", icon: "🏆", target: "#competition" },
 ];
 
 export default function Development() {
@@ -52,27 +52,30 @@ export default function Development() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-6 md:gap-4">
             {steps.map((step, index) => (
-              <motion.div
+              <motion.a
                 key={step.label}
+                href={step.target}
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.1 + index * 0.12, duration: 0.6 }}
-                className="flex flex-col items-center text-center relative"
+                className="flex flex-col items-center text-center relative group/step cursor-pointer"
               >
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-rm-red/30 bg-rm-dark flex items-center justify-center text-2xl md:text-3xl mb-4 relative z-10 hover:border-rm-red hover:shadow-[0_0_20px_rgba(217,4,41,0.3)] transition-all duration-300">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-rm-red/30 bg-rm-dark flex items-center justify-center text-2xl md:text-3xl mb-4 relative z-10 group-hover/step:border-rm-red group-hover/step:shadow-[0_0_20px_rgba(217,4,41,0.3)] group-hover/step:-translate-y-1 transition-all duration-300">
                   {step.icon}
                 </div>
-                <p className="font-bold text-sm md:text-base mb-1">
+                <p className="font-bold text-sm md:text-base mb-1 group-hover/step:text-rm-red transition-colors">
                   {step.label}
                 </p>
-                <p className="text-rm-gray text-xs">{step.labelCn}</p>
+                <p className="text-rm-gray text-xs group-hover/step:text-white transition-colors">
+                  {step.labelCn}
+                </p>
 
                 {index < steps.length - 1 && (
                   <div className="hidden md:block absolute top-10 md:top-12 -right-2 text-rm-red/40 text-lg">
                     →
                   </div>
                 )}
-              </motion.div>
+              </motion.a>
             ))}
           </div>
         </div>

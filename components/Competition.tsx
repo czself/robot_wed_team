@@ -79,12 +79,15 @@ export default function Competition() {
 
           <div className="space-y-4">
             {awards.map((award, index) => (
-              <motion.div
+              <motion.a
                 key={`${award.year}-${award.title}`}
+                href="https://www.robomaster.com/zh-CN"
+                target="_blank"
+                rel="noopener noreferrer"
                 initial={{ opacity: 0, x: 30 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
-                className="group relative p-0 rounded-2xl overflow-hidden border bg-white/[0.02] card-hover"
+                className="group relative p-0 rounded-2xl overflow-hidden border bg-white/[0.02] card-hover block"
               >
                 <div className="absolute inset-0">
                   <Image
@@ -113,8 +116,11 @@ export default function Competition() {
                     {award.title}
                   </h4>
                   <p className="text-sm text-rm-gray">{award.event}</p>
+                  <p className="mt-3 inline-flex items-center gap-1 text-[11px] text-rm-blue/80 font-mono">
+                    RoboMaster 官网 <span className="group-hover:translate-x-0.5 transition-transform">↗</span>
+                  </p>
                 </div>
-              </motion.div>
+              </motion.a>
             ))}
           </div>
         </div>
