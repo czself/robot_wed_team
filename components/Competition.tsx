@@ -109,7 +109,7 @@ export default function Competition() {
           <div className="space-y-4">
             {awards.map((award, index) => (
               <motion.div
-                key={`${award.year}-${award.title}`}
+                key={`${award.year}-${award.title}-${index}`}
                 initial={{ opacity: 0, x: 30 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: 0.3 + index * 0.12, duration: 0.6 }}

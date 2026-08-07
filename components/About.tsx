@@ -52,8 +52,8 @@ export default function About() {
             className="relative aspect-square max-w-sm mx-auto w-full rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(217,4,41,0.5)] group block"
           >
             <Image
-              src="/images/gallery/gallery-17.jpg"
-              alt="YZ Control 战队"
+              src="/images/gallery/gallery-01.jpg"
+              alt="YZ Control 战队三机合影"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
               sizes="(max-width: 1024px) 80vw, 30vw"

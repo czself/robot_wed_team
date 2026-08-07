@@ -72,7 +72,7 @@ export default function Hero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/gallery/gallery-01.jpg"
+          src="/images/hero-bg.jpg"
           alt=""
           fill
           className="object-cover"
