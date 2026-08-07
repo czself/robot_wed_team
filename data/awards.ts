@@ -3,6 +3,7 @@ export interface Award {
   title: string;
   event: string;
   level: "national" | "provincial" | "regional";
+  certificate?: string;
 }
 
 export const awards: Award[] = [
@@ -11,12 +12,14 @@ export const awards: Award[] = [
     title: "全国二等奖",
     event: "RoboMaster 2026 步兵对抗赛",
     level: "national",
+    certificate: "/images/awards/certificate-1.jpg",
   },
   {
     year: "2026",
     title: "全国三等奖",
     event: "RoboMaster 2026 机甲大师超级对抗赛 3v3",
     level: "national",
+    certificate: "/images/awards/certificate-2.jpg",
   },
 ];
 
