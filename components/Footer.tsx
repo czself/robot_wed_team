@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded bg-rm-red flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded bg-gradient-to-br from-rm-red to-rm-blue flex items-center justify-center font-bold text-xs">
                 YZ
               </div>
               <span className="text-lg font-bold tracking-wider">

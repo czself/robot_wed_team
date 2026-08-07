@@ -20,10 +20,11 @@ export default function Team() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Our Team
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Our</span>{" "}
+            <span className="text-rm-blue">Team</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             六大技术方向
           </h2>
         </motion.div>
@@ -37,7 +38,9 @@ export default function Team() {
               transition={{ delay: 0.1 + index * 0.1, duration: 0.6 }}
               className={`p-6 rounded-xl border bg-white/[0.02] cursor-pointer transition-all duration-300 hud-corner ${
                 expandedId === group.id
-                  ? "border-rm-red/50 shadow-[0_0_30px_rgba(217,4,41,0.15)]"
+                  ? index % 2 === 0
+                    ? "border-rm-red/50 shadow-[0_0_30px_rgba(217,4,41,0.15)]"
+                    : "border-rm-blue/50 shadow-[0_0_30px_rgba(0,200,255,0.15)]"
                   : "border-white/5 hover:border-rm-red/30 hover:shadow-[0_0_20px_rgba(217,4,41,0.1)]"
               }`}
               onClick={() =>
@@ -67,10 +70,14 @@ export default function Team() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
-                      {group.skills.map((skill) => (
+                      {group.skills.map((skill, si) => (
                         <span
                           key={skill}
-                          className="px-3 py-1 text-xs bg-rm-red/10 text-rm-red rounded-full border border-rm-red/20"
+                          className={`px-3 py-1 text-xs rounded-full border ${
+                            si % 2 === 0
+                              ? "bg-rm-red/10 text-rm-red border-rm-red/20"
+                              : "bg-rm-blue/10 text-rm-blue border-rm-blue/20"
+                          }`}
                         >
                           {skill}
                         </span>

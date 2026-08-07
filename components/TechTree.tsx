@@ -156,10 +156,11 @@ export default function TechTree() {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Technology
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Tech</span>{" "}
+            <span className="text-rm-blue">nology</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             技术栈
           </h2>
         </motion.div>

@@ -20,14 +20,15 @@ export default function Join() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Recruitment
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Re</span>{" "}
+            <span className="text-rm-blue">cruitment</span>
           </p>
 
-          <h2 className="text-5xl md:text-7xl font-black mb-4">
+          <h2 className="text-5xl md:text-7xl font-black mb-4 text-rm-blue">
             Don&apos;t Watch.
           </h2>
-          <h2 className="text-5xl md:text-7xl font-black text-gradient-red mb-8">
+          <h2 className="text-5xl md:text-7xl font-black mb-8 bg-gradient-to-r from-rm-red to-rm-blue bg-clip-text text-transparent">
             Join.
           </h2>
 
@@ -35,7 +36,7 @@ export default function Join() {
             不要只是观看。
           </p>
           <p className="text-2xl font-bold">
-            成为<span className="text-gradient-red">创造者</span>。
+            成为<span className="bg-gradient-to-r from-rm-red to-rm-blue bg-clip-text text-transparent">创造者</span>。
           </p>
         </motion.div>
 

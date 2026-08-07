@@ -98,7 +98,7 @@ export default function Hero() {
         {particles.map((p) => (
           <motion.div
             key={p.id}
-            className="absolute w-1 h-1 bg-rm-red/30 rounded-full"
+            className={`absolute w-1 h-1 rounded-full ${p.id % 2 === 0 ? "bg-rm-red/40" : "bg-rm-blue/40"}`}
             initial={{
               x: p.x,
               y: p.y,
@@ -125,8 +125,9 @@ export default function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8"
         >
-          <div className="w-20 h-20 mx-auto rounded-2xl bg-rm-red/10 border border-rm-red/30 flex items-center justify-center animate-glow-pulse">
-            <span className="text-3xl font-black text-rm-red">YZ</span>
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-rm-red/15 to-rm-blue/15 border border-rm-red/30 flex items-center justify-center animate-glow-pulse relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-rm-red/20 via-transparent to-rm-blue/20" />
+            <span className="relative text-3xl font-black bg-gradient-to-br from-rm-red to-rm-blue bg-clip-text text-transparent">YZ</span>
           </div>
         </motion.div>
 
@@ -134,9 +135,11 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-sm tracking-[0.3em] text-rm-gray uppercase mb-6"
+          className="text-sm tracking-[0.3em] uppercase mb-6"
         >
-          YZ Control Robotics
+          <span className="text-rm-red">YZ</span>{" "}
+          <span className="text-rm-gray">Control</span>{" "}
+          <span className="text-rm-blue">Robotics</span>
         </motion.p>
 
         <motion.div
@@ -146,8 +149,8 @@ export default function Hero() {
           className="mb-8"
         >
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight">
-            <span className="text-gradient-red">{displayText}</span>
-            <span className="inline-block w-[3px] h-[0.8em] bg-rm-red ml-2 align-middle" style={{ animation: "typing-cursor 1s step-end infinite" }} />
+            <span className="bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">{displayText}</span>
+            <span className="inline-block w-[3px] h-[0.8em] bg-gradient-to-b from-rm-red to-rm-blue ml-2 align-middle" style={{ animation: "typing-cursor 1s step-end infinite" }} />
           </h1>
         </motion.div>
 

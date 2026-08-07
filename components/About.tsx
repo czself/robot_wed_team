@@ -31,13 +31,14 @@ export default function About() {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            About Us
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">About</span>{" "}
+            <span className="text-rm-blue">Us</span>
           </p>
           <h2 className="text-4xl md:text-6xl font-black mb-8">
             我们不是在学习机器人
           </h2>
-          <h2 className="text-4xl md:text-6xl font-black text-gradient-red">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             我们正在创造机器人
           </h2>
         </motion.div>

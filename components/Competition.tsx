@@ -32,17 +32,18 @@ export default function Competition() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Competition
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Compe</span>{" "}
+            <span className="text-rm-blue">tition</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             赛场荣耀
           </h2>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-rm-red/50 via-rm-blue/30 to-transparent" />
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-rm-red/60 via-rm-blue/40 to-transparent" />
 
             <div className="space-y-12">
               {timeline.map((year, yearIndex) => (
@@ -53,11 +54,13 @@ export default function Competition() {
                   transition={{ delay: 0.2 + yearIndex * 0.15, duration: 0.6 }}
                   className="relative pl-12"
                 >
-                  <div className="absolute left-0 top-0 w-8 h-8 rounded-full bg-rm-dark border-2 border-rm-red flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-rm-red" />
+                  <div className={`absolute left-0 top-0 w-8 h-8 rounded-full bg-rm-dark border-2 flex items-center justify-center ${
+                    yearIndex % 2 === 0 ? "border-rm-red" : "border-rm-blue"
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${yearIndex % 2 === 0 ? "bg-rm-red" : "bg-rm-blue"}`} />
                   </div>
 
-                  <div className="text-2xl font-black text-gradient-red mb-3">
+                  <div className={`text-2xl font-black mb-3 bg-gradient-to-r ${yearIndex % 2 === 0 ? "from-rm-red to-rm-red/60" : "from-rm-blue to-rm-blue/60"} bg-clip-text text-transparent`}>
                     {year.year}
                   </div>
 

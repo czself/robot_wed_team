@@ -39,16 +39,17 @@ export default function Development() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Development
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Develop</span>{" "}
+            <span className="text-rm-blue">ment</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             研发流程
           </h2>
         </motion.div>
 
         <div className="relative">
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rm-red/30 to-transparent -translate-y-1/2" />
+          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rm-red/30 via-rm-blue/30 to-transparent -translate-y-1/2" />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-6 md:gap-4">
             {steps.map((step, index) => (
@@ -60,7 +61,11 @@ export default function Development() {
                 transition={{ delay: 0.1 + index * 0.12, duration: 0.6 }}
                 className="flex flex-col items-center text-center relative group/step cursor-pointer"
               >
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-rm-red/30 bg-rm-dark flex items-center justify-center text-2xl md:text-3xl mb-4 relative z-10 group-hover/step:border-rm-red group-hover/step:shadow-[0_0_20px_rgba(217,4,41,0.3)] group-hover/step:-translate-y-1 transition-all duration-300">
+                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full border-2 bg-rm-dark flex items-center justify-center text-2xl md:text-3xl mb-4 relative z-10 transition-all duration-300 group-hover/step:-translate-y-1 ${
+                  index % 2 === 0
+                    ? "border-rm-red/30 group-hover/step:border-rm-red group-hover/step:shadow-[0_0_20px_rgba(217,4,41,0.3)]"
+                    : "border-rm-blue/30 group-hover/step:border-rm-blue group-hover/step:shadow-[0_0_20px_rgba(0,200,255,0.3)]"
+                }`}>
                   {step.icon}
                 </div>
                 <p className="font-bold text-sm md:text-base mb-1 group-hover/step:text-rm-red transition-colors">
@@ -71,7 +76,7 @@ export default function Development() {
                 </p>
 
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-10 md:top-12 -right-2 text-rm-red/40 text-lg">
+                  <div className={`hidden md:block absolute top-10 md:top-12 -right-2 text-lg ${index % 2 === 0 ? "text-rm-red/40" : "text-rm-blue/40"}`}>
                     →
                   </div>
                 )}

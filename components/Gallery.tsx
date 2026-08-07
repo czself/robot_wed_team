@@ -38,10 +38,11 @@ export default function Gallery() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-sm tracking-[0.3em] text-rm-red uppercase mb-4">
-            Gallery
+          <p className="text-sm tracking-[0.3em] uppercase mb-4">
+            <span className="text-rm-red">Gal</span>{" "}
+            <span className="text-rm-blue">lery</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black">
+          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             光影记录
           </h2>
         </motion.div>

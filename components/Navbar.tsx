@@ -34,7 +34,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <a href="#" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded bg-rm-red flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded bg-gradient-to-br from-rm-red to-rm-blue flex items-center justify-center font-bold text-xs">
             YZ
           </div>
           <span className="text-lg font-bold tracking-wider group-hover:text-rm-red transition-colors">
