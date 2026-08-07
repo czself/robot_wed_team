@@ -167,6 +167,58 @@ body {
   }
 }
 
+@keyframes scan-frame {
+  0% {
+    transform: translateY(-110%);
+    opacity: 0;
+  }
+  10%, 90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+}
+
+@keyframes hud-sweep {
+  0% {
+    left: -30%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+@keyframes ring-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes tick-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes carousel-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes typing-cursor {
   0%, 100% {
     opacity: 1;
@@ -186,6 +238,56 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-ring-pulse {
+  animation: ring-pulse 2.4s ease-in-out infinite;
+}
+
+.animate-tick {
+  animation: tick-blink 1.4s steps(2) infinite;
+}
+
+.hud-sweep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  left: -30%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 200, 255, 0.12),
+    rgba(0, 200, 255, 0.35),
+    rgba(0, 200, 255, 0.12),
+    transparent
+  );
+  animation: hud-sweep 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.scan-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-frame::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(0, 200, 255, 0.06) 40%,
+    rgba(0, 200, 255, 0.14) 50%,
+    rgba(0, 200, 255, 0.06) 60%,
+    transparent
+  );
+  animation: scan-frame 5s linear infinite;
+  pointer-events: none;
 }
 
 .text-gradient-red {

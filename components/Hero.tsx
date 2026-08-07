@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 const titles = [
@@ -69,6 +70,19 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-screen flex items-center justify-center overflow-hidden"
     >
+      <div className="absolute inset-0">
+        <Image
+          src="/images/gallery/gallery-01.jpg"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.7)_75%)]" />
+      </div>
+
       <div className="absolute inset-0 bg-grid opacity-40" />
 
       <div className="absolute inset-0 bg-radial-glow" />

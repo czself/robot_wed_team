@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 
 const steps = [
@@ -19,7 +20,17 @@ export default function Development() {
 
   return (
     <section className="relative py-32 px-6 overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="absolute inset-0">
+        <Image
+          src="/images/gallery/gallery-04.jpg"
+          alt=""
+          fill
+          className="object-cover opacity-[0.12]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-rm-dark via-rm-dark/85 to-rm-dark" />
+      </div>
+      <div className="absolute inset-0 bg-grid opacity-15" />
 
       <div className="max-w-7xl mx-auto relative" ref={ref}>
         <motion.div

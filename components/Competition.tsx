@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { timeline, awards } from "@/data/awards";
 
@@ -83,24 +84,36 @@ export default function Competition() {
                 initial={{ opacity: 0, x: 30 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
-                className={`p-5 rounded-xl border bg-white/[0.02] card-hover ${
-                  levelColors[award.level]
-                }`}
+                className="group relative p-0 rounded-2xl overflow-hidden border bg-white/[0.02] card-hover"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono tracking-wider opacity-60">
-                    {award.year}
-                  </span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${
-                      levelColors[award.level]
-                    }`}
-                  >
-                    {levelLabels[award.level]}
-                  </span>
+                <div className="absolute inset-0">
+                  <Image
+                    src="/images/gallery/gallery-07.jpg"
+                    alt=""
+                    fill
+                    className="object-cover opacity-15 group-hover:opacity-25 group-hover:scale-105 transition-all duration-700"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 to-black/60" />
                 </div>
-                <h4 className="text-lg font-bold mb-1">{award.title}</h4>
-                <p className="text-sm text-rm-gray">{award.event}</p>
+                <div className={`relative p-5 ${levelColors[award.level]}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-mono tracking-wider opacity-60">
+                      {award.year}
+                    </span>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border ${
+                        levelColors[award.level]
+                      }`}
+                    >
+                      {levelLabels[award.level]}
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold mb-1 text-white">
+                    {award.title}
+                  </h4>
+                  <p className="text-sm text-rm-gray">{award.event}</p>
+                </div>
               </motion.div>
             ))}
           </div>

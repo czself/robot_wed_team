@@ -5,9 +5,32 @@ export interface Robot {
   description: string;
   specs: { label: string; value: string }[];
   tags: string[];
+  images?: string[];
 }
 
 export const robots: Robot[] = [
+  {
+    id: "hero",
+    name: "Hero",
+    nameCn: "英雄机器人",
+    description:
+      "3v3 赛场上的火力核心。大弹丸高伤害发射器 + 双轴云台精准打击，一击制胜的重炮手，在关键时刻扭转战局。",
+    specs: [
+      { label: "弹丸类型", value: "17mm 高伤弹" },
+      { label: "云台响应", value: "1 kHz INS" },
+      { label: "底盘电机", value: "4×M3508" },
+      { label: "云台电机", value: "2×GM6020" },
+      { label: "控制周期", value: "50 Hz / 200 Hz" },
+      { label: "MCU", value: "STM32F407" },
+    ],
+    tags: ["STM32F407", "FreeRTOS", "大弹丸", "CAN", "BMI088", "EKF"],
+    images: [
+      "/images/robots/hero-1.png",
+      "/images/robots/hero-2.png",
+      "/images/robots/hero-3.png",
+      "/images/robots/hero-4.png",
+    ],
+  },
   {
     id: "infantry",
     name: "Infantry",
@@ -23,20 +46,12 @@ export const robots: Robot[] = [
       { label: "MCU", value: "STM32F407" },
     ],
     tags: ["STM32F407", "FreeRTOS", "PID", "CAN", "BMI088", "EKF"],
-  },
-  {
-    id: "engineer",
-    name: "Engineer",
-    nameCn: "工程机器人",
-    description:
-      "3v3 赛场的资源核心。自主取弹兑换，机械臂与视觉引导协同，在激烈对抗中稳定保障弹药供给。",
-    specs: [
-      { label: "取弹时间", value: "< 8s" },
-      { label: "机械臂自由度", value: "5 DOF" },
-      { label: "视觉引导", value: "YOLOv8" },
-      { label: "底盘电机", value: "4×M3508" },
+    images: [
+      "/images/robots/infantry-1.png",
+      "/images/robots/infantry-2.png",
+      "/images/robots/infantry-3.png",
+      "/images/robots/infantry-4.png",
     ],
-    tags: ["YOLOv8", "机械臂", "视觉引导", "自主取弹"],
   },
   {
     id: "sentry",
@@ -51,5 +66,11 @@ export const robots: Robot[] = [
       { label: "底盘电机", value: "4×M3508" },
     ],
     tags: ["强化学习", "TensorRT", "自动巡逻", "目标追踪"],
+    images: [
+      "/images/robots/sentry-1.png",
+      "/images/robots/sentry-2.png",
+      "/images/robots/sentry-3.png",
+      "/images/robots/sentry-4.png",
+    ],
   },
 ];
