@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Wall from "@/components/Wall";
 import Footer from "@/components/Footer";
-import { motion } from "framer-motion";
 
 export const metadata = {
   title: "留言墙 · YZ Control | RoboMaster 2026",
@@ -21,12 +20,7 @@ export default function WallPage() {
         <div className="absolute bottom-1/4 -right-40 w-96 h-96 rounded-full bg-rm-blue/10 blur-[140px] pointer-events-none" aria-hidden />
 
         <div className="relative">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12 animate-fade-in">
             <p className="text-sm tracking-[0.3em] uppercase mb-4">
               <span className="text-rm-red">Message</span>{" "}
               <span className="text-rm-blue">Wall</span>
@@ -42,7 +36,7 @@ export default function WallPage() {
               <span className="animate-tick">OPEN TO ALL</span>
               <span className="h-px w-12 bg-gradient-to-r from-transparent via-rm-blue/50 to-transparent" />
             </div>
-          </motion.div>
+          </div>
 
           <Wall />
         </div>
