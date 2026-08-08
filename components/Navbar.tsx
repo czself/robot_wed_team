@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Tech", href: "#tech" },
   { label: "Awards", href: "#competition" },
   { label: "留言墙", href: "/wall" },
+  { label: "报名", href: "/recruit" },
   { label: "Join Us", href: "#join" },
 ];
 
@@ -60,6 +61,13 @@ export default function Navbar() {
           >
             <span>留言墙</span>
             <span className="text-[10px] opacity-70">💬</span>
+          </a>
+          <a
+            href="/recruit"
+            className="px-5 py-2 border border-rm-blue/40 hover:border-rm-blue text-rm-blue hover:bg-rm-blue/10 text-sm font-medium rounded transition-colors flex items-center gap-1.5"
+          >
+            <span>报名</span>
+            <span className="text-[10px] opacity-70">🚀</span>
           </a>
           <a
             href="https://www.robomaster.com/zh-CN"
@@ -125,6 +133,13 @@ export default function Navbar() {
                 className="px-5 py-2 border border-rm-red/40 hover:border-rm-red text-rm-red hover:bg-rm-red/10 text-sm font-medium rounded transition-colors text-center"
               >
                 留言墙 💬
+              </a>
+              <a
+                href="/recruit"
+                onClick={() => setMobileOpen(false)}
+                className="px-5 py-2 border border-rm-blue/40 hover:border-rm-blue text-rm-blue hover:bg-rm-blue/10 text-sm font-medium rounded transition-colors text-center"
+              >
+                报名 🚀
               </a>
               <a
                 href="https://www.robomaster.com/zh-CN"

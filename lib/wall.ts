@@ -31,9 +31,22 @@ function sanitizeNick(s: string): string {
   return v || "匿名访客";
 }
 
-export async function listMessages(): Promise<WallMessageWithReplies[]> {
+export type SortKey = "hot" | "new";
+
+export async function listMessages(opts?: {
+  sort?: SortKey;
+  offset?: number;
+  limit?: number;
+}): Promise<{
+  data: WallMessageWithReplies[];
+  total: number;
+}> {
+  const sort = opts?.sort ?? "hot";
+  const offset = Math.max(0, opts?.offset ?? 0);
+  const limit = Math.min(50, Math.max(1, opts?.limit ?? 10));
+
   const ids = await kv.lrange(MSG_KEY, 0, -1);
-  if (!ids.length) return [];
+  if (!ids.length) return { data: [], total: 0 };
 
   const metas = await kv.mget(...ids.map((id) => `${META_PREFIX}${id}`));
   const messages: WallMessage[] = [];
@@ -59,13 +72,20 @@ export async function listMessages(): Promise<WallMessageWithReplies[]> {
     }
   }
 
-  const sortFn = (a: WallMessageWithReplies, b: WallMessageWithReplies) =>
-    b.likes - a.likes || b.createdAt - a.createdAt;
-  roots.sort(sortFn);
+  if (sort === "hot") {
+    roots.sort(
+      (a, b) => b.likes - a.likes || b.createdAt - a.createdAt
+    );
+  } else {
+    roots.sort((a, b) => b.createdAt - a.createdAt);
+  }
   for (const r of roots) {
     r.replies?.sort((a, b) => a.createdAt - b.createdAt);
   }
-  return roots;
+
+  const total = roots.length;
+  const page = roots.slice(offset, offset + limit);
+  return { data: page, total };
 }
 
 export async function createMessage(input: {

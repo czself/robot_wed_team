@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { WallMessageWithReplies } from "@/lib/wall";
+import type { WallMessageWithReplies, SortKey } from "@/lib/wall";
+
+const PAGE_SIZE = 10;
 
 const COLORS = [
   "from-rm-red to-rm-blue",
@@ -177,8 +179,11 @@ function MessageCard({
 
 export default function Wall() {
   const [messages, setMessages] = useState<WallMessageWithReplies[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortKey>("hot");
+  const [page, setPage] = useState(0);
 
   const [nickname, setNickname] = useState("");
   const [content, setContent] = useState("");
@@ -190,18 +195,21 @@ export default function Wall() {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
 
   const refresh = useCallback(async () => {
+    const offset = page * PAGE_SIZE;
+    const url = `/api/wall?sort=${sort}&offset=${offset}&limit=${PAGE_SIZE}`;
     try {
-      const res = await fetch("/api/wall", { cache: "no-store" });
+      const res = await fetch(url, { cache: "no-store" });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "加载失败");
       setMessages(json.data || []);
+      setTotal(json.total || 0);
       setError(null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sort, page]);
 
   useEffect(() => {
     try {
@@ -210,6 +218,19 @@ export default function Wall() {
     } catch {}
     refresh();
   }, [refresh]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const changeSort = (s: SortKey) => {
+    setSort(s);
+    setPage(0);
+  };
+
+  const goToPage = (p: number) => {
+    setPage(Math.max(0, Math.min(p, totalPages - 1)));
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const handleLike = async (id: string) => {
     const wasLiked = likedIds.has(id);
@@ -272,6 +293,8 @@ export default function Wall() {
       if (!json.ok) throw new Error(json.error || "发送失败");
       setContent("");
       setReplyTo(null);
+      setPage(0);
+      setSort("new");
       await refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -343,18 +366,40 @@ export default function Wall() {
         </div>
       </motion.div>
 
-      <div className="flex items-center justify-between mb-4 px-1">
-        <p className="text-xs tracking-[0.3em] text-rm-gray/60 font-mono uppercase">
-          {messages.length > 0
-            ? `${messages.length} 条留言`
-            : "BE THE FIRST"}
-        </p>
-        <button
-          onClick={refresh}
-          className="text-[11px] text-rm-gray hover:text-rm-blue transition-colors flex items-center gap-1"
-        >
-          刷新 ↻
-        </button>
+      <div className="flex items-center justify-between mb-4 px-1 flex-wrap gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => changeSort("hot")}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              sort === "hot"
+                ? "bg-rm-red text-white border border-rm-red/40 shadow-[0_0_12px_rgba(217,4,41,0.3)]"
+                : "bg-white/5 text-rm-gray hover:text-white border border-white/5"
+            }`}
+          >
+            🔥 热门
+          </button>
+          <button
+            onClick={() => changeSort("new")}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              sort === "new"
+                ? "bg-rm-blue text-white border border-rm-blue/40 shadow-[0_0_12px_rgba(0,200,255,0.3)]"
+                : "bg-white/5 text-rm-gray hover:text-white border border-white/5"
+            }`}
+          >
+            🕒 最新
+          </button>
+        </div>
+        <div className="flex items-center gap-3 text-xs text-rm-gray/60 font-mono">
+          <span>
+            {total > 0 ? `${total} 条留言` : "BE THE FIRST"}
+          </span>
+          <button
+            onClick={refresh}
+            className="hover:text-rm-blue transition-colors flex items-center gap-1"
+          >
+            刷新 ↻
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -396,7 +441,41 @@ export default function Wall() {
         </div>
       )}
 
-      <div className="mt-12 text-center text-[10px] tracking-[0.3em] text-rm-gray/30 font-mono uppercase">
+      {totalPages > 1 && !loading && !error && (
+        <div className="mt-8 flex items-center justify-center gap-2">
+          <button
+            onClick={() => goToPage(page - 1)}
+            disabled={page === 0}
+            className="w-9 h-9 rounded-lg glass flex items-center justify-center text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:text-rm-red transition-colors"
+            aria-label="上一页"
+          >
+            ‹
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
+            <button
+              key={p}
+              onClick={() => goToPage(p)}
+              className={`w-9 h-9 rounded-lg text-sm font-mono transition-all ${
+                page === p
+                  ? "bg-gradient-to-br from-rm-red to-rm-blue text-white shadow-lg"
+                  : "glass text-rm-gray hover:text-white"
+              }`}
+            >
+              {p + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => goToPage(page + 1)}
+            disabled={page >= totalPages - 1}
+            className="w-9 h-9 rounded-lg glass flex items-center justify-center text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:text-rm-blue transition-colors"
+            aria-label="下一页"
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      <div className="mt-10 text-center text-[10px] tracking-[0.3em] text-rm-gray/30 font-mono uppercase">
         <span className="w-8 h-px inline-block bg-rm-red/30 align-middle mr-2" />
         END OF WALL
         <span className="w-8 h-px inline-block bg-rm-blue/30 align-middle ml-2" />

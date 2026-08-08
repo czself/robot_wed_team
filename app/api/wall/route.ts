@@ -4,6 +4,7 @@ import {
   createMessage,
   likeMessage,
   isValidParentId,
+  type SortKey,
 } from "@/lib/wall";
 
 export const dynamic = "force-dynamic";
@@ -15,10 +16,18 @@ function clientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip") || "anon";
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const data = await listMessages();
-    return NextResponse.json({ ok: true, data });
+    const url = new URL(req.url);
+    const sort = (url.searchParams.get("sort") as SortKey) || "hot";
+    const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "10", 10);
+    const result = await listMessages({
+      sort: sort === "new" ? "new" : "hot",
+      offset: Number.isFinite(offset) ? offset : 0,
+      limit: Number.isFinite(limit) ? limit : 10,
+    });
+    return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     return NextResponse.json(
       { ok: false, error: (err as Error).message },
