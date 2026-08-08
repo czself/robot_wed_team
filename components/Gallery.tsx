@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 
@@ -21,13 +21,44 @@ const galleryItems = [
   { id: 14, src: "/images/gallery/gallery-14.jpg", label: "热血瞬间" },
   { id: 15, src: "/images/gallery/gallery-15.jpg", label: "队徽" },
   { id: 16, src: "/images/gallery/gallery-16.jpg", label: "IP 形象" },
-  { id: 17, src: "/images/gallery/gallery-17.jpg", label: "YZ Control" },
+  { id: 17, src: "/images/gallery/gallery-17.jpg", label: "队徽" },
 ];
 
 export default function Gallery() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [selected, setSelected] = useState<number | null>(null);
+
+  const currentIndex = selected !== null
+    ? galleryItems.findIndex((i) => i.id === selected)
+    : -1;
+
+  const goNext = useCallback(() => {
+    setSelected((prev) => {
+      if (prev === null) return null;
+      const idx = galleryItems.findIndex((i) => i.id === prev);
+      return galleryItems[(idx + 1) % galleryItems.length].id;
+    });
+  }, []);
+
+  const goPrev = useCallback(() => {
+    setSelected((prev) => {
+      if (prev === null) return null;
+      const idx = galleryItems.findIndex((i) => i.id === prev);
+      return galleryItems[(idx - 1 + galleryItems.length) % galleryItems.length].id;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selected === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, goNext, goPrev]);
 
   return (
     <section id="gallery" className="relative py-32 px-6 overflow-hidden">
@@ -83,13 +114,31 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 md:p-8"
             onClick={() => setSelected(null)}
           >
+            <button
+              onClick={(e) => { e.stopPropagation(); goPrev(); }}
+              className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white text-xl transition-all active:scale-90"
+              aria-label="上一张"
+            >
+              ‹
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); goNext(); }}
+              className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white text-xl transition-all active:scale-90"
+              aria-label="下一张"
+            >
+              ›
+            </button>
+
             <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              key={selected}
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="relative max-w-4xl w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/10"
               onClick={(e) => e.stopPropagation()}
             >
@@ -100,8 +149,22 @@ export default function Gallery() {
                   fill
                   className="object-contain"
                   sizes="90vw"
+                  priority
                 />
               )}
+
+              <button
+                onClick={() => setSelected(null)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center text-white text-sm transition-all z-10"
+                aria-label="关闭"
+              >
+                ✕
+              </button>
+
+              <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 text-white text-xs font-mono z-10">
+                {currentIndex + 1} / {galleryItems.length}
+              </div>
+
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                 <p className="text-white font-medium">
                   {galleryItems.find((i) => i.id === selected)?.label}

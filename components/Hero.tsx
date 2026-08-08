@@ -170,13 +170,13 @@ export default function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
-            href="#about"
+            href="/#about"
             className="px-8 py-3.5 bg-rm-red hover:bg-red-700 text-white font-medium rounded transition-all hover:shadow-[0_0_30px_rgba(217,4,41,0.4)]"
           >
             探索更多
           </a>
           <a
-            href="#join"
+            href="/recruit"
             className="px-8 py-3.5 border border-white/20 hover:border-rm-red/50 text-white font-medium rounded transition-all hover:shadow-[0_0_20px_rgba(217,4,41,0.2)]"
           >
             加入我们

@@ -98,7 +98,7 @@ export default function Team() {
                   {expandedId === group.id ? "收起" : "展开技能树"}
                 </span>
                 <a
-                  href="#join"
+                  href="/recruit"
                   onClick={(e) => e.stopPropagation()}
                   className="text-rm-red/80 hover:text-rm-red transition-colors"
                 >

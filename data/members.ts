@@ -51,9 +51,9 @@ export const teamGroups: TeamGroup[] = [
 ];
 
 export const recruitmentLinks: Record<string, string> = {
-  mechanical: "#",
-  embedded: "#",
-  vision: "#",
-  algorithm: "#",
-  operations: "#",
+  mechanical: "/recruit",
+  embedded: "/recruit",
+  vision: "/recruit",
+  algorithm: "/recruit",
+  operations: "/recruit",
 };

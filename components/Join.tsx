@@ -74,7 +74,7 @@ export default function Join() {
           className="text-center"
         >
           <a
-            href="#"
+            href="/recruit"
             className="inline-block px-12 py-5 bg-rm-red hover:bg-red-700 text-white text-lg font-bold rounded-lg transition-all hover:shadow-[0_0_40px_rgba(217,4,41,0.4)] animate-glow-pulse"
           >
             加入我们 →
