@@ -5,10 +5,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 const titles = [
-  "BUILD THE FUTURE",
   "YZ CONTROL",
-  "创造机器人",
-  "未来，从这里开始",
+  "以代码铸甲",
+  "用钢铁为刃",
+  "战场见",
 ];
 
 interface Particle {
@@ -161,6 +161,8 @@ export default function Hero() {
           className="text-lg md:text-xl text-rm-gray mb-12 max-w-2xl mx-auto"
         >
           RoboMaster 2026 · 步兵对抗赛 & 3v3
+          <br />
+          <span className="text-rm-red/80">从 STM32 到 AI 自瞄，零基础也能成为机甲大师</span>
         </motion.p>
 
         <motion.div

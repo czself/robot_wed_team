@@ -7,6 +7,7 @@ import {
   isValidParentId,
   type SortKey,
 } from "@/lib/wall";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -71,6 +72,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const ip = clientIp(req);
+    const rl = checkRateLimit(`wall:post:${ip}`);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { ok: false, error: "操作太频繁，请稍后再试" },
+        { status: 429 }
+      );
+    }
+
     const parentId =
       isValidParentId(body.parentId) ? body.parentId : null;
 
@@ -90,8 +101,8 @@ export async function DELETE(req: NextRequest) {
     const id = url.searchParams.get("id");
     const key = url.searchParams.get("key");
 
-    const adminKey = process.env.ADMIN_KEY || "yz-control-admin-2026";
-    if (key !== adminKey) {
+    const adminKey = process.env.ADMIN_KEY;
+    if (!adminKey || key !== adminKey) {
       return NextResponse.json(
         { ok: false, error: "未授权" },
         { status: 401 }

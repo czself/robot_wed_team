@@ -4,14 +4,11 @@ import { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
 const statusItems = [
-  { label: "MCU", value: "STM32", state: "Online", color: "text-green-400" },
-  { label: "CAN BUS", value: "1Mbps", state: "Active", color: "text-green-400" },
-  { label: "MOTOR", value: "M3508", state: "Ready", color: "text-rm-blue" },
-  { label: "IMU", value: "BMI088", state: "Calibrated", color: "text-rm-blue" },
-  { label: "VISION", value: "YOLOv8", state: "Running", color: "text-green-400" },
-  { label: "COMM", value: "DR16", state: "Linked", color: "text-green-400" },
-  { label: "POWER", value: "24V", state: "Nominal", color: "text-rm-blue" },
-  { label: "TEAM", value: "YZ Control", state: "Recruiting", color: "text-rm-red" },
+  { label: "LAST BATTLE", value: "2026.04", state: "上海站", color: "text-rm-blue" },
+  { label: "INFANTRY", value: "步兵对抗赛", state: "国二", color: "text-yellow-400" },
+  { label: "SQUAD", value: "3v3 对抗赛", state: "国三", color: "text-green-400" },
+  { label: "ROBOTS", value: "步兵/工程/哨兵", state: "3台", color: "text-rm-blue" },
+  { label: "MEMBERS", value: "YZ Control", state: "Recruiting", color: "text-rm-red" },
 ];
 
 export default function SystemStatus() {
@@ -49,7 +46,7 @@ export default function SystemStatus() {
             <span className="text-rm-blue">Status</span>
           </p>
           <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
-            实验室实时状态
+            战队战绩
           </h2>
         </motion.div>
 

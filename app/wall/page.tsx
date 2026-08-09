@@ -1,6 +1,4 @@
-import Navbar from "@/components/Navbar";
 import Wall from "@/components/Wall";
-import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "留言墙 · YZ Control | RoboMaster 2026",
@@ -12,9 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default function WallPage() {
   return (
-    <>
-      <Navbar />
-      <main className="relative min-h-screen pt-32 pb-20 px-6 overflow-hidden">
+    <main className="relative min-h-screen pt-32 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-20" />
         <div className="absolute top-1/4 -left-40 w-96 h-96 rounded-full bg-rm-red/10 blur-[140px] pointer-events-none" aria-hidden />
         <div className="absolute bottom-1/4 -right-40 w-96 h-96 rounded-full bg-rm-blue/10 blur-[140px] pointer-events-none" aria-hidden />
@@ -41,7 +37,5 @@ export default function WallPage() {
           <Wall />
         </div>
       </main>
-      <Footer />
-    </>
   );
 }

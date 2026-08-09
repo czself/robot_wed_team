@@ -1,77 +1,45 @@
-"use client";
-
-const socialLinks = [
-  { label: "GitHub", href: "https://github.com/totrytakeoff/RM2026/tree/new/basic_framework" },
-  { label: "QQ群", href: "#" },
-];
-
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/5 py-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded bg-gradient-to-br from-rm-red to-rm-blue flex items-center justify-center font-bold text-xs">
-                YZ
-              </div>
-              <span className="text-lg font-bold tracking-wider">
-                YZ CONTROL
-              </span>
-            </div>
-            <p className="text-rm-gray text-sm leading-relaxed max-w-md">
-              Future Starts Here. 未来，从这里开始。
-              <br />
-              RoboMaster 2026 步兵对抗赛国二 · 3v3 国三
-            </p>
+    <footer className="relative border-t border-white/5 bg-[#0A0A0A] py-10 px-6">
+      <div className="absolute inset-0 bg-grid opacity-10" />
+      <div className="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-gradient-to-br from-rm-red to-rm-blue flex items-center justify-center font-bold text-xs">
+            YZ
           </div>
-
-          <div>
-            <h4 className="font-bold text-sm tracking-wider uppercase mb-4">
-              联系方式
-            </h4>
-            <div className="space-y-2 text-sm text-rm-gray">
-              <p>豫章师范学院</p>
-              <p>红角洲校区</p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-sm tracking-wider uppercase mb-4">
-              关注我们
-            </h4>
-            <div className="space-y-2">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={link.href.startsWith("http") ? "_blank" : undefined}
-                  rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="block text-sm text-rm-gray hover:text-white transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <a
-                href="https://www.robomaster.com/zh-CN"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-sm text-rm-blue hover:text-white transition-colors"
-              >
-                RoboMaster 官网 ↗
-              </a>
-            </div>
-          </div>
+          <span className="text-sm font-bold tracking-wider">
+            YZ CONTROL
+          </span>
         </div>
 
-        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-rm-gray">
-            © {new Date().getFullYear()} YZ Control. All rights reserved.
-          </p>
-          <p className="text-xs text-rm-gray">
-            Built with ❤️ and 🔧
-          </p>
+        <div className="flex items-center gap-6 text-sm text-rm-gray">
+          <a
+            href="https://www.robomaster.com/zh-CN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-rm-blue transition-colors"
+          >
+            RoboMaster
+          </a>
+          <a
+            href="https://space.bilibili.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-rm-red transition-colors"
+          >
+            B站
+          </a>
+          <a
+            href="/recruit"
+            className="hover:text-rm-red transition-colors"
+          >
+            加入我们
+          </a>
         </div>
+
+        <p className="text-xs text-rm-gray/50">
+          &copy; {new Date().getFullYear()} YZ Control. All rights reserved.
+        </p>
       </div>
     </footer>
   );
