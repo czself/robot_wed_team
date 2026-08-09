@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { label: "About", href: "/#about" },
-  { label: "Robots", href: "/#robots" },
   { label: "Tech", href: "/#tech" },
+  { label: "培养", href: "/#training" },
   { label: "Awards", href: "/#competition" },
   { label: "留言墙", href: "/wall" },
 ];

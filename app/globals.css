@@ -378,3 +378,53 @@ body {
   border-bottom: 2px solid;
   border-right: 2px solid;
 }
+
+/* ===== Marquee Animations ===== */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.marquee-left {
+  animation: scrollLeft var(--marquee-speed, 80s) linear infinite;
+}
+
+.marquee-right {
+  animation: scrollRight var(--marquee-speed, 80s) linear infinite;
+}
+
+.marquee-paused {
+  animation-play-state: paused !important;
+}
+
+/* ===== HUD Sweep ===== */
+.hud-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(57, 113, 237, 0.3), transparent);
+  animation: hudSweep 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes hudSweep {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
