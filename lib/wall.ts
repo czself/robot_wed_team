@@ -128,3 +128,15 @@ export async function likeMessage(
 export function isValidParentId(s: unknown): s is string {
   return typeof s === "string" && /^[a-z0-9]{8,24}$/i.test(s);
 }
+
+export async function deleteMessage(id: string): Promise<{ deleted: boolean }> {
+  const metaKey = `${META_PREFIX}${id}`;
+  const raw = await kv.get(metaKey);
+  if (!raw) return { deleted: false };
+
+  await kv.del(metaKey);
+  await kv.del(`${LIKES_PREFIX}${id}`);
+  await kv.lrem(MSG_KEY, 0, id);
+
+  return { deleted: true };
+}

@@ -4,10 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { label: "About", href: "/#about" },
-  { label: "Tech", href: "/#tech" },
-  { label: "培养", href: "/#training" },
-  { label: "Awards", href: "/#competition" },
+  { label: "首页", href: "/" },
+  { label: "星图", href: "/tech" },
+  { label: "关于", href: "/about" },
   { label: "留言墙", href: "/wall" },
 ];
 

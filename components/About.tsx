@@ -6,10 +6,10 @@ import { motion, useInView } from "framer-motion";
 import CountUp from "react-countup";
 
 const stats = [
-  { value: 20, suffix: "+", label: "队员", href: "#team" },
-  { value: 1, suffix: "年", label: "建队即国二", href: "#competition" },
+  { value: 20, suffix: "+", label: "队员", href: "/about#team" },
+  { value: 1, suffix: "年", label: "建队即国二", href: "/about#competition" },
   { value: 2, suffix: "项", label: "国家级奖项", href: "https://www.robomaster.com/zh-CN", external: true },
-  { value: 168, suffix: "MHz", label: "主频", href: "#tech" },
+  { value: 168, suffix: "MHz", label: "主频", href: "/tech" },
 ];
 
 export default function About() {
@@ -45,7 +45,7 @@ export default function About() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10 items-center mb-20">
           <motion.a
-            href="#team"
+            href="/about"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -71,7 +71,7 @@ export default function About() {
                 </p>
               </div>
               <span className="text-[10px] text-white/70 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
-                查看团队 →
+                了解我们 →
               </span>
             </div>
           </motion.a>

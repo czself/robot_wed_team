@@ -3,6 +3,7 @@ import {
   listMessages,
   createMessage,
   likeMessage,
+  deleteMessage,
   isValidParentId,
   type SortKey,
 } from "@/lib/wall";
@@ -75,6 +76,36 @@ export async function POST(req: NextRequest) {
 
     const msg = await createMessage({ nickname, content, parentId });
     return NextResponse.json({ ok: true, data: msg });
+  } catch (err) {
+    return NextResponse.json(
+      { ok: false, error: (err as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    const key = url.searchParams.get("key");
+
+    const adminKey = process.env.ADMIN_KEY || "yz-control-admin-2026";
+    if (key !== adminKey) {
+      return NextResponse.json(
+        { ok: false, error: "未授权" },
+        { status: 401 }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { ok: false, error: "缺少 id" },
+        { status: 400 }
+      );
+    }
+    const result = await deleteMessage(id);
+    return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     return NextResponse.json(
       { ok: false, error: (err as Error).message },
