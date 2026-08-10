@@ -212,11 +212,22 @@ export default function Wall() {
   }, [sort, page]);
 
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("wall:liked") || "[]");
-      if (Array.isArray(saved)) setLikedIds(new Set(saved));
-    } catch {}
-    refresh();
+    const timer = window.setTimeout(() => {
+      try {
+        const saved = JSON.parse(localStorage.getItem("wall:liked") || "[]");
+        if (Array.isArray(saved)) setLikedIds(new Set(saved));
+      } catch {}
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void refresh();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [refresh]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));

@@ -5,22 +5,27 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: "#0A0A0A",
 };
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: "../public/fonts/geist-latin.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "../public/fonts/geist-mono-latin.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://yz-control.top"),
   title: "YZ Control | RoboMaster 2026",
   description:
     "YZ Control — RoboMaster 2026 步兵对抗赛国二、3v3 国三。步兵、工程、哨兵三台机器人，从 STM32 嵌入式到视觉自瞄，我们用代码和钢铁征服赛场。",

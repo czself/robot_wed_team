@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const titles = [
@@ -19,36 +20,34 @@ interface Particle {
   delay: number;
 }
 
+function createParticles(width: number, height: number): Particle[] {
+  return Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    x: Math.random() * width,
+    y: Math.random() * height,
+    duration: 3 + Math.random() * 4,
+    delay: Math.random() * 5,
+  }));
+}
+
 export default function Hero() {
   const [titleIndex, setTitleIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const [particles] = useState<Particle[]>(() => createParticles(1440, 900));
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    setParticles(
-      Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        x: Math.random() * w,
-        y: Math.random() * h,
-        duration: 3 + Math.random() * 4,
-        delay: Math.random() * 5,
-      }))
-    );
-  }, []);
-
-  useEffect(() => {
     const currentTitle = titles[titleIndex];
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
     if (!isDeleting && displayText === currentTitle) {
       timeout = setTimeout(() => setIsDeleting(true), 2000);
     } else if (isDeleting && displayText === "") {
-      setIsDeleting(false);
-      setTitleIndex((prev) => (prev + 1) % titles.length);
+      timeout = setTimeout(() => {
+        setIsDeleting(false);
+        setTitleIndex((prev) => (prev + 1) % titles.length);
+      }, 0);
     } else {
       timeout = setTimeout(
         () => {
@@ -62,7 +61,9 @@ export default function Hero() {
       );
     }
 
-    return () => clearTimeout(timeout);
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [displayText, isDeleting, titleIndex]);
 
   return (
@@ -171,18 +172,18 @@ export default function Hero() {
           transition={{ delay: 0.9, duration: 0.6 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <a
+          <Link
             href="/#about"
             className="px-8 py-3.5 bg-rm-red hover:bg-red-700 text-white font-medium rounded transition-all hover:shadow-[0_0_30px_rgba(217,4,41,0.4)]"
           >
             探索更多
-          </a>
-          <a
+          </Link>
+          <Link
             href="/recruit"
             className="px-8 py-3.5 border border-white/20 hover:border-rm-red/50 text-white font-medium rounded transition-all hover:shadow-[0_0_20px_rgba(217,4,41,0.2)]"
           >
             加入我们
-          </a>
+          </Link>
           <a
             href="https://www.robomaster.com/zh-CN"
             target="_blank"

@@ -14,7 +14,7 @@ function clientIp(req: NextRequest): string {
 export async function POST(req: NextRequest) {
   try {
     const ip = clientIp(req);
-    const rl = checkRateLimit(`recruit:${ip}`);
+    const rl = await checkRateLimit(`recruit:${ip}`);
     if (!rl.allowed) {
       return NextResponse.json(
         { ok: false, error: "提交太频繁，请稍后再试" },
@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { id: entry.id } });
   } catch (err) {
+    console.error("recruit submit failed:", err);
     return NextResponse.json(
-      { ok: false, error: (err as Error).message },
+      { ok: false, error: "服务器暂时不可用，请稍后再试" },
       { status: 500 }
     );
   }

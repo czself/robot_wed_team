@@ -72,6 +72,15 @@ const GROUP_LABELS: Record<string, string> = {
   operations: "运营组",
 };
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function sendMailNotice(entry: RecruitEntry): Promise<void> {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || "465");
@@ -108,7 +117,10 @@ export async function sendMailNotice(entry: RecruitEntry): Promise<void> {
       </div>
       <div style="padding:20px 24px;font-size:14px;line-height:2;color:#111">
         ${lines
-          .map((l) => `<div style="border-bottom:1px solid #f3f4f6;padding:4px 0">${l}</div>`)
+          .map(
+            (l) =>
+              `<div style="border-bottom:1px solid #f3f4f6;padding:4px 0">${escapeHtml(l)}</div>`
+          )
           .join("")}
       </div>
       <div style="padding:12px 24px;background:#f9fafb;color:#6b7280;font-size:12px;text-align:center">

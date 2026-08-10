@@ -31,8 +31,9 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
+    console.error("wall list failed:", err);
     return NextResponse.json(
-      { ok: false, error: (err as Error).message },
+      { ok: false, error: "服务器暂时不可用，请稍后再试" },
       { status: 500 }
     );
   }
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = clientIp(req);
-    const rl = checkRateLimit(`wall:post:${ip}`);
+    const rl = await checkRateLimit(`wall:post:${ip}`);
     if (!rl.allowed) {
       return NextResponse.json(
         { ok: false, error: "操作太频繁，请稍后再试" },
@@ -88,8 +89,9 @@ export async function POST(req: NextRequest) {
     const msg = await createMessage({ nickname, content, parentId });
     return NextResponse.json({ ok: true, data: msg });
   } catch (err) {
+    console.error("wall post failed:", err);
     return NextResponse.json(
-      { ok: false, error: (err as Error).message },
+      { ok: false, error: "服务器暂时不可用，请稍后再试" },
       { status: 500 }
     );
   }
@@ -99,10 +101,11 @@ export async function DELETE(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
-    const key = url.searchParams.get("key");
 
     const adminKey = process.env.ADMIN_KEY;
-    if (!adminKey || key !== adminKey) {
+    const auth = req.headers.get("authorization") || "";
+    const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
+    if (!adminKey || token !== adminKey) {
       return NextResponse.json(
         { ok: false, error: "未授权" },
         { status: 401 }
@@ -118,8 +121,9 @@ export async function DELETE(req: NextRequest) {
     const result = await deleteMessage(id);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
+    console.error("wall delete failed:", err);
     return NextResponse.json(
-      { ok: false, error: (err as Error).message },
+      { ok: false, error: "服务器暂时不可用，请稍后再试" },
       { status: 500 }
     );
   }

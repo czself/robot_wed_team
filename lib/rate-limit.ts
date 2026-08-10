@@ -1,9 +1,12 @@
+import { kv } from "@vercel/kv";
+
 const store = new Map<string, { count: number; resetAt: number }>();
 
 const WINDOW_MS = 60_000;
+const WINDOW_SECONDS = WINDOW_MS / 1000;
 const MAX_REQUESTS = 10;
 
-export function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
+function checkMemoryRateLimit(key: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const entry = store.get(key);
 
@@ -18,6 +21,24 @@ export function checkRateLimit(key: string): { allowed: boolean; remaining: numb
 
   entry.count++;
   return { allowed: true, remaining: MAX_REQUESTS - entry.count };
+}
+
+export async function checkRateLimit(key: string): Promise<{ allowed: boolean; remaining: number }> {
+  try {
+    const kvKey = `rate:${key}`;
+    const count = await kv.incr(kvKey);
+    if (count === 1) {
+      await kv.expire(kvKey, WINDOW_SECONDS);
+    }
+
+    return {
+      allowed: count <= MAX_REQUESTS,
+      remaining: Math.max(0, MAX_REQUESTS - count),
+    };
+  } catch (err) {
+    console.warn("KV rate limit unavailable, using memory fallback:", err);
+    return checkMemoryRateLimit(key);
+  }
 }
 
 setInterval(() => {

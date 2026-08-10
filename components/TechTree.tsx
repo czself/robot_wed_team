@@ -64,7 +64,6 @@ function TechNodeCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const isRoot = depth === 0;
-  const isLeaf = !node.children || node.children.length === 0;
 
   const colors = [
     "border-rm-red/40 text-rm-red bg-rm-red/5",
