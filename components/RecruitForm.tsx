@@ -4,11 +4,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 const GROUPS = [
-  { key: "mechanical", label: "机械组", desc: "结构设计 / 加工装配", icon: "⚙️" },
-  { key: "embedded", label: "嵌入式组", desc: "嵌入式开发 / 硬件电路", icon: "🔌" },
-  { key: "vision", label: "视觉组", desc: "计算机视觉 / 图像处理", icon: "👁️" },
-  { key: "algorithm", label: "算法组", desc: "运动控制 / 导航算法", icon: "🧠" },
-  { key: "operations", label: "运营组", desc: "宣传 / 策划 / 外联", icon: "📢" },
+  { key: "mechanical", label: "机械组", desc: "结构设计 / 加工装配" },
+  { key: "embedded", label: "嵌入式组", desc: "固件开发 / 运动控制" },
+  { key: "vision", label: "视觉组", desc: "识别追踪 / 自瞄部署" },
+  { key: "algorithm", label: "算法组", desc: "导航决策 / 路径规划" },
+  { key: "operations", label: "运营组", desc: "宣传策划 / 赛事外联" },
 ];
 
 const GENDERS = ["男", "女", "其他"];
@@ -91,8 +91,23 @@ export default function RecruitForm() {
             <p className="text-rm-gray text-sm leading-relaxed max-w-sm mx-auto">
               感谢 {form.name} 的报名，我们已收到你的信息。
               <br />
-              战队会尽快通过邮件/电话与你联系，请留意通知。
+              负责人会通过电话或邮箱联系你，请保持联系方式可用。
             </p>
+            <div className="mt-6 grid gap-3 text-left">
+              {["准备一段 1 分钟自我介绍", "想一想最感兴趣的方向和原因", "留意后续交流与训练营通知"].map(
+                (item, index) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-3 rounded-lg border border-white/5 bg-rm-dark/60 px-4 py-3"
+                  >
+                    <span className="text-rm-blue font-mono text-xs">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-sm text-rm-gray">{item}</span>
+                  </div>
+                )
+              )}
+            </div>
             <button
               onClick={() => {
                 setForm(initialForm);
@@ -120,6 +135,16 @@ export default function RecruitForm() {
         <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-rm-blue/10 blur-3xl opacity-60" />
 
         <div className="relative space-y-5">
+          <div>
+            <p className="text-xs tracking-[0.25em] uppercase text-rm-blue mb-2">
+              Application
+            </p>
+            <h2 className="text-2xl font-black text-white">填写报名信息</h2>
+            <p className="mt-2 text-sm text-rm-gray">
+              信息只用于招新联系，请填写常用电话和邮箱。
+            </p>
+          </div>
+
           <div>
             <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
               姓名 <span className="text-rm-red">*</span>
@@ -185,7 +210,7 @@ export default function RecruitForm() {
             <label className="block text-xs font-medium text-rm-gray mb-2 tracking-wider">
               意向组别 <span className="text-rm-red">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {GROUPS.map((g) => (
                 <button
                   key={g.key}
@@ -198,7 +223,6 @@ export default function RecruitForm() {
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-base">{g.icon}</span>
                     <span
                       className={`text-sm font-bold ${
                         form.group === g.key ? "text-white" : "text-rm-gray"
@@ -210,7 +234,7 @@ export default function RecruitForm() {
                       <span className="ml-auto text-rm-red text-xs">✓</span>
                     )}
                   </div>
-                  <p className="text-[11px] text-rm-gray/60 pl-7">{g.desc}</p>
+                  <p className="text-[11px] text-rm-gray/60">{g.desc}</p>
                 </button>
               ))}
             </div>
@@ -256,7 +280,7 @@ export default function RecruitForm() {
                 提交中...
               </>
             ) : (
-              "提交报名 🚀"
+              "提交报名"
             )}
           </button>
 
