@@ -119,11 +119,12 @@ export default function Robots() {
             transition={{ duration: 0.5 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
-            <div className="relative scan-frame hud-sweep rounded-3xl overflow-hidden">
+            <div className="relative scan-frame rounded-3xl overflow-hidden lg:order-2">
               <div className="relative aspect-[4/5] sm:aspect-square max-h-[560px] rounded-3xl bg-white/[0.02] overflow-hidden flex items-center justify-center shadow-[0_30px_90px_-30px_rgba(0,0,0,0.9)] p-[1px]">
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-rm-red/40 via-white/10 to-rm-blue/40 opacity-60" />
 
-                <div className="relative w-full h-full rounded-[calc(1.5rem-1px)] overflow-hidden bg-rm-dark flex items-center justify-center">
+                <div className="relative w-full h-full rounded-[calc(1.5rem-1px)] overflow-hidden bg-gradient-to-br from-white/12 via-[#131722] to-rm-blue/10 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-grid opacity-20" />
                   {hasImages && (
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -138,7 +139,7 @@ export default function Robots() {
                           src={images[imageIndex]}
                           alt={`${activeRobot.nameCn} 实拍 ${imageIndex + 1}`}
                           fill
-                          className="object-cover"
+                          className="object-contain p-6"
                           sizes="(max-width: 1024px) 100vw, 50vw"
                           priority
                         />
@@ -166,7 +167,7 @@ export default function Robots() {
                     </>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-black/30 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/15 pointer-events-none" />
 
                   {hasImages && images.length > 1 && (
                     <div className="absolute top-0 left-0 right-0 h-[2px] z-30 bg-white/5">
@@ -268,7 +269,7 @@ export default function Robots() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative lg:order-1">
               <div className="absolute -top-8 -left-2 text-7xl md:text-8xl font-black text-white/[0.03] select-none pointer-events-none">
                 {unitCode}
               </div>
