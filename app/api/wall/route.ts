@@ -58,7 +58,15 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      const voter = `${clientIp(req)}#${(
+      const ip = clientIp(req);
+      const rl = await checkRateLimit(`wall:like:${ip}`);
+      if (!rl.allowed) {
+        return NextResponse.json(
+          { ok: false, error: "操作太频繁，请稍后再试" },
+          { status: 429 }
+        );
+      }
+      const voter = `${ip}#${(
         req.headers.get("user-agent") || ""
       ).slice(0, 32)}`;
       const res = await likeMessage(id, voter);
