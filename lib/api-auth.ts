@@ -18,21 +18,6 @@ export async function currentApiUser(): Promise<
   return { ok: true, user };
 }
 
-export async function currentApiAdmin(): Promise<
-  | { ok: true; user: PublicTeamUser }
-  | { ok: false; response: NextResponse }
-> {
-  const auth = await currentApiUser();
-  if (!auth.ok) return auth;
-  if (auth.user.role !== "admin") {
-    return {
-      ok: false,
-      response: NextResponse.json({ ok: false, error: "无权限" }, { status: 403 }),
-    };
-  }
-  return auth;
-}
-
 export async function currentApiMember(): Promise<
   | { ok: true; user: PublicTeamUser }
   | { ok: false; response: NextResponse }

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, LogIn, Mail } from "lucide-react";
+import { Badge, Lock, LogIn } from "lucide-react";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.ok) throw new Error(json?.error || "登录失败");
@@ -44,17 +44,17 @@ export default function LoginForm() {
         </p>
         <h1 className="text-3xl font-black text-white">队员登录</h1>
         <p className="mt-3 text-sm leading-7 text-rm-gray">
-          游客可以继续浏览公开官网。队员和管理员统一从这里登录，登录后可查看队内资料和后台记录。
+          游客可以继续浏览公开官网。队员从这里登录后可查看队内资料和后台记录。
         </p>
 
         <div className="mt-7 space-y-4">
           <label className="relative block">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
+            <Badge className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
             <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="队员邮箱 / 管理员邮箱"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              inputMode="numeric"
+              placeholder="学号 / 用户名"
               className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/70 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-blue/50"
             />
           </label>
@@ -83,7 +83,7 @@ export default function LoginForm() {
         <button
           type="button"
           onClick={submit}
-          disabled={!email.trim() || !password || loading}
+          disabled={!username.trim() || !password || loading}
           className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-rm-red px-5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <LogIn className="h-4 w-4" />

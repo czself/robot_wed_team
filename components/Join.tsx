@@ -127,7 +127,7 @@ export default function Join() {
                 </div>
                 <p className="text-sm font-bold text-white">RoboMaster 招新群</p>
                 <p className="mt-1 text-xs leading-5 text-rm-gray">
-                  备注姓名和意向组别，方便管理员通过。
+                  备注姓名和意向组别，方便队员通过。
                 </p>
               </div>
             </div>

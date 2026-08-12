@@ -7,7 +7,7 @@ import {
   validateUserInput,
   validateUserUpdateInput,
 } from "@/lib/auth";
-import { currentApiAdmin } from "@/lib/api-auth";
+import { currentApiUser } from "@/lib/api-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     return NextResponse.json({ ok: true, data: await listUsers() });
   } catch (err) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
     const result = validateUserInput(body);
@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
     const result = validateUserUpdateInput(body);
@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, data: updatedUser });
   } catch (err) {
     const message = err instanceof Error ? err.message : "更新失败";
-    const status = ["账号不存在", "不能禁用当前登录账号", "不能取消当前登录账号的管理员权限"].includes(message)
+    const status = ["账号不存在", "不能禁用当前登录账号"].includes(message)
       ? 400
       : 500;
     return NextResponse.json({ ok: false, error: message }, { status });
@@ -78,7 +78,7 @@ export async function DELETE(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const id = new URL(req.url).searchParams.get("id") || "";
     if (!id) {

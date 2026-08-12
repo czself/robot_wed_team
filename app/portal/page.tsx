@@ -27,7 +27,7 @@ const modules = [
   },
   {
     title: "队内后台",
-    desc: "队员查看报名和留言，管理员维护账号和资料。",
+    desc: "队员维护账号、报名、留言和资料。",
     href: "/portal/admin",
     icon: ShieldCheck,
   },
@@ -63,9 +63,9 @@ export default async function PortalPage() {
         </div>
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
           <div className="font-mono text-3xl font-black text-rm-red">
-            {user.role === "admin" ? "ADMIN" : "MEMBER"}
+            {user.username}
           </div>
-          <div className="mt-1 text-sm text-rm-gray">当前权限</div>
+          <div className="mt-1 text-sm text-rm-gray">当前账号</div>
         </div>
       </div>
 

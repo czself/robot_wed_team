@@ -26,16 +26,21 @@ export async function POST(req: NextRequest) {
     await ensureBootstrapAdmin();
 
     const body = await req.json().catch(() => null);
-    const email = typeof body?.email === "string" ? body.email : "";
+    const username =
+      typeof body?.username === "string"
+        ? body.username
+        : typeof body?.email === "string"
+          ? body.email
+          : "";
     const password = typeof body?.password === "string" ? body.password : "";
-    if (!email || !password) {
+    if (!username || !password) {
       return NextResponse.json(
-        { ok: false, error: "请输入邮箱和密码" },
+        { ok: false, error: "请输入学号和密码" },
         { status: 400 }
       );
     }
 
-    const user = await authenticateUser(email, password);
+    const user = await authenticateUser(username, password);
     if (!user) {
       return NextResponse.json(
         { ok: false, error: "账号或密码不正确" },

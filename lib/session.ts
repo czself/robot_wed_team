@@ -79,9 +79,3 @@ export async function requireUser(): Promise<PublicTeamUser> {
   if (!user) redirect("/login");
   return user;
 }
-
-export async function requireAdmin(): Promise<PublicTeamUser> {
-  const user = await requireUser();
-  if (user.role !== "admin") redirect("/portal");
-  return user;
-}

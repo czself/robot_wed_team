@@ -1,8 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { KeyRound, Plus, RefreshCw, Save, Trash2, UserPlus } from "lucide-react";
-import type { PublicTeamUser, UserRole, UserStatus } from "@/lib/auth";
+import {
+  KeyRound,
+  Plus,
+  RefreshCw,
+  Save,
+  Search,
+  Trash2,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import type { PublicTeamUser, UserStatus } from "@/lib/auth";
 
 const groups = ["机械组", "嵌入式组", "视觉组", "算法组", "运营组", "综合"];
 
@@ -13,16 +22,33 @@ export default function AdminUserCreator({
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [form, setForm] = useState({
-    email: "",
+    username: "",
     name: "",
-    password: "",
-    role: "member" as UserRole,
+    password: "123456",
     group: "嵌入式组",
   });
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [passwordDrafts, setPasswordDrafts] = useState<Record<string, string>>({});
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | UserStatus>("all");
+  const [groupFilter, setGroupFilter] = useState("all");
   const [error, setError] = useState<string | null>(null);
+
+  const activeCount = users.filter((user) => user.status === "active").length;
+  const disabledCount = users.length - activeCount;
+  const filteredUsers = users.filter((user) => {
+    const q = query.trim().toLowerCase();
+    const matchesQuery =
+      !q ||
+      [user.username, user.name, user.group, user.status]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+    const matchesGroup = groupFilter === "all" || user.group === groupFilter;
+    return matchesQuery && matchesStatus && matchesGroup;
+  });
 
   const update = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -31,7 +57,7 @@ export default function AdminUserCreator({
 
   const patchUser = async (
     id: string,
-    patch: Partial<Pick<PublicTeamUser, "name" | "role" | "group" | "status">> & {
+    patch: Partial<Pick<PublicTeamUser, "name" | "group" | "status">> & {
       password?: string;
     }
   ) => {
@@ -61,7 +87,7 @@ export default function AdminUserCreator({
 
   const removeUser = async (user: PublicTeamUser) => {
     if (updatingId) return;
-    const ok = window.confirm(`确认删除队员账号 ${user.name}（${user.email}）？`);
+    const ok = window.confirm(`确认删除队员账号 ${user.name}（${user.username}）？`);
     if (!ok) return;
 
     setUpdatingId(user.id);
@@ -94,10 +120,9 @@ export default function AdminUserCreator({
       if (!res.ok || !json?.ok) throw new Error(json?.error || "创建失败");
       setUsers((prev) => [json.data, ...prev]);
       setForm({
-        email: "",
+        username: "",
         name: "",
-        password: "",
-        role: "member",
+        password: "123456",
         group: "嵌入式组",
       });
     } catch (e) {
@@ -108,7 +133,37 @@ export default function AdminUserCreator({
   };
 
   return (
-    <section className="grid gap-5 lg:grid-cols-[420px_1fr]">
+    <section id="accounts" className="space-y-5">
+      <div className="flex flex-col gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-5 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-rm-blue/30 bg-rm-blue/10 text-rm-blue">
+            <Users className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-white">账号管理</h3>
+            <p className="mt-1 text-sm text-rm-gray">
+              集中查看、创建、停用、删除队员账号，并可重置密码。
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-lg border border-white/10 bg-rm-dark/70 px-4 py-3">
+            <div className="font-mono text-xl font-black text-white">{users.length}</div>
+            <div className="text-xs text-rm-gray">总账号</div>
+          </div>
+          <div className="rounded-lg border border-rm-blue/20 bg-rm-blue/10 px-4 py-3">
+            <div className="font-mono text-xl font-black text-rm-blue">{activeCount}</div>
+            <div className="text-xs text-rm-gray">启用</div>
+          </div>
+          <div className="rounded-lg border border-rm-red/20 bg-rm-red/10 px-4 py-3">
+            <div className="font-mono text-xl font-black text-rm-red">{disabledCount}</div>
+            <div className="text-xs text-rm-gray">停用</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[420px_1fr]">
       <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-rm-red/30 bg-rm-red/10 text-rm-red">
@@ -116,16 +171,16 @@ export default function AdminUserCreator({
           </div>
           <div>
             <h3 className="font-black text-white">创建队员账号</h3>
-            <p className="text-xs text-rm-gray">账号不开放游客自助注册</p>
+            <p className="text-xs text-rm-gray">使用学号作为用户名，默认密码 123456</p>
           </div>
         </div>
 
         <div className="space-y-3">
           <input
-            value={form.email}
-            onChange={(e) => update("email", e.target.value)}
-            type="email"
-            placeholder="邮箱"
+            value={form.username}
+            onChange={(e) => update("username", e.target.value)}
+            inputMode="numeric"
+            placeholder="学号 / 用户名"
             className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-blue/50"
           />
           <input
@@ -138,26 +193,18 @@ export default function AdminUserCreator({
             value={form.password}
             onChange={(e) => update("password", e.target.value)}
             type="password"
-            placeholder="初始密码，至少 6 位"
+            placeholder="初始密码，默认 123456"
             className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-red/50"
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div>
             <select
               value={form.group}
               onChange={(e) => update("group", e.target.value)}
-              className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none focus:border-rm-blue/50"
+              className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none focus:border-rm-blue/50"
             >
               {groups.map((group) => (
                 <option key={group}>{group}</option>
               ))}
-            </select>
-            <select
-              value={form.role}
-              onChange={(e) => update("role", e.target.value)}
-              className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none focus:border-rm-red/50"
-            >
-              <option value="member">队员</option>
-              <option value="admin">管理员</option>
             </select>
           </div>
         </div>
@@ -180,14 +227,60 @@ export default function AdminUserCreator({
       </div>
 
       <div className="overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
-        <div className="border-b border-white/10 px-4 py-3 text-sm font-bold text-white">
-          已有账号 · {users.length}
+        <div className="border-b border-white/10 p-4">
+          <div className="mb-3 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <div className="text-sm font-bold text-white">
+                已有队员账号 · {filteredUsers.length}/{users.length}
+              </div>
+              <div className="mt-1 text-xs text-rm-gray">
+                修改姓名和组别后需要点击保存；停用后该账号不能登录。
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[minmax(180px,1fr)_120px_120px]">
+              <label className="relative block">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="搜索学号、姓名、组别"
+                  className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 pl-10 pr-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-blue/50"
+                />
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as "all" | UserStatus)}
+                className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-sm text-white outline-none focus:border-rm-blue/50"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">启用</option>
+                <option value="disabled">停用</option>
+              </select>
+              <select
+                value={groupFilter}
+                onChange={(e) => setGroupFilter(e.target.value)}
+                className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-sm text-white outline-none focus:border-rm-blue/50"
+              >
+                <option value="all">全部组别</option>
+                {groups.map((group) => (
+                  <option key={group}>{group}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="hidden grid-cols-[1.1fr_120px_100px_220px_260px] gap-3 px-3 pt-2 text-xs font-bold uppercase tracking-[0.14em] text-rm-gray xl:grid">
+            <div>账号 / 姓名</div>
+            <div>组别</div>
+            <div>状态</div>
+            <div>重置密码</div>
+            <div>操作</div>
+          </div>
         </div>
         <div className="divide-y divide-white/5">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className="grid gap-3 px-4 py-4 text-sm text-rm-gray xl:grid-cols-[1.1fr_120px_110px_100px_220px_260px]"
+              className="grid gap-3 px-4 py-4 text-sm text-rm-gray xl:grid-cols-[1.1fr_120px_100px_220px_260px]"
             >
               <div>
                 <input
@@ -202,7 +295,9 @@ export default function AdminUserCreator({
                   }}
                   className="h-9 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm font-bold text-white outline-none focus:border-rm-blue/50"
                 />
-                <div className="font-mono text-xs">{user.email}</div>
+                <div className="font-mono text-xs">
+                  {user.username}
+                </div>
               </div>
               <select
                 value={user.group}
@@ -218,22 +313,6 @@ export default function AdminUserCreator({
                 {groups.map((group) => (
                   <option key={group}>{group}</option>
                 ))}
-              </select>
-              <select
-                value={user.role}
-                onChange={(e) =>
-                  setUsers((prev) =>
-                    prev.map((item) =>
-                      item.id === user.id
-                        ? { ...item, role: e.target.value as UserRole }
-                        : item
-                    )
-                  )
-                }
-                className="h-9 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-sm text-white outline-none focus:border-rm-red/50"
-              >
-                <option value="member">队员</option>
-                <option value="admin">管理员</option>
               </select>
               <select
                 value={user.status}
@@ -281,7 +360,6 @@ export default function AdminUserCreator({
                     void patchUser(user.id, {
                       name: user.name,
                       group: user.group,
-                      role: user.role,
                     })
                   }
                   disabled={updatingId === user.id}
@@ -306,12 +384,13 @@ export default function AdminUserCreator({
               </div>
             </div>
           ))}
-          {!users.length && (
+          {!filteredUsers.length && (
             <div className="px-4 py-12 text-center text-sm text-rm-gray">
-              暂无队员账号
+              没有匹配的队员账号
             </div>
           )}
         </div>
+      </div>
       </div>
     </section>
   );

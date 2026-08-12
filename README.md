@@ -25,11 +25,11 @@ npm run dev
 
 ## 环境变量
 
-基础门户账号会在第一次登录请求时自动初始化。管理员密码至少 6 位：
+基础队员账号会在第一次登录请求时自动初始化。密码至少 6 位：
 
 ```bash
-TEAM_ADMIN_EMAIL=admin@yz-control.local
-TEAM_ADMIN_PASSWORD=change-this-password
+TEAM_MEMBER_USERNAME=2025754227
+TEAM_MEMBER_PASSWORD=change-this-password
 ```
 
 旧版 Bearer `ADMIN_KEY` 只建议作为过渡或应急通道。默认不启用；确实需要时显式打开：
@@ -55,9 +55,9 @@ Vercel KV 变量由 Vercel 绑定提供，或在本地按 `@vercel/kv` 要求配
 
 - 队内资料不要放在 `public/`，否则知道路径的人都能访问。
 - `/portal/*` 需要队员登录。
-- `/portal/admin/*` 使用队员账号登录；队员可查看报名记录和留言记录。
-- 删除报名/留言、创建账号、维护资料仅管理员账号可用。
-- 管理员创建队员账号，不开放游客自助注册。
+- `/portal/admin/*` 使用队员账号登录；队员可查看和维护报名记录、留言记录、账号和资料。
+- 只有游客和队员两种访问状态，不再区分其他身份。
+- 队员创建队员账号，不开放游客自助注册。
 
 ## 验证
 

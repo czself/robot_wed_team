@@ -9,14 +9,13 @@ export const metadata = {
 };
 
 export default async function PortalWallAdminPage() {
-  const user = await requireUser();
-  const isAdmin = user.role === "admin";
+  await requireUser();
   const result = await listMessages({
     sort: "new",
     offset: 0,
     limit: 50,
-    includePending: isAdmin,
+    includePending: true,
   });
 
-  return <AdminWallManager initialMessages={result.data} canDelete={isAdmin} />;
+  return <AdminWallManager initialMessages={result.data} canDelete />;
 }

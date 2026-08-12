@@ -7,7 +7,7 @@ import {
   deleteEntry,
 } from "@/lib/recruit";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { currentApiAdmin } from "@/lib/api-auth";
+import { currentApiUser } from "@/lib/api-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ function clientIp(req: NextRequest): string {
 
 export async function GET() {
   try {
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
 
     const entries = await listEntries();
@@ -73,7 +73,7 @@ export async function DELETE(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
 
     const url = new URL(req.url);

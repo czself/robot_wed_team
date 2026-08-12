@@ -80,7 +80,7 @@ export default function AdminWallManager({
       <div className="border-b border-white/10 px-5 py-4">
         <h2 className="text-2xl font-black text-white">留言管理</h2>
         <p className="mt-2 text-sm text-rm-gray">
-          队员可查看已显示的留言，管理员可审核待显示内容并删除不合适的留言。
+          队员可审核待显示内容，并删除不合适的留言。
         </p>
       </div>
 

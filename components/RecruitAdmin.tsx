@@ -150,7 +150,7 @@ export default function RecruitAdmin({
             报名记录
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-rm-gray">
-            队员登录后可查看提交成功写入 KV 的完整名单，管理员可删除误填或测试记录。
+            队员登录后可查看提交成功写入 KV 的完整名单，也可删除误填或测试记录。
           </p>
         </div>
 

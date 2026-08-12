@@ -71,7 +71,7 @@ export default function AdminResourceManager({
       <div className="border-b border-white/10 px-5 py-4">
         <h3 className="font-black text-white">资料索引管理</h3>
         <p className="mt-1 text-xs text-rm-gray">
-          默认资料只读，管理员新增的资料可以编辑和删除。
+          默认资料只读，队员新增的资料可以编辑和删除。
         </p>
       </div>
 

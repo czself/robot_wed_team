@@ -10,7 +10,6 @@ import {
 } from "@/lib/wall";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/session";
-import { isLegacyAdminRequest } from "@/lib/legacy-admin";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +29,10 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(url.searchParams.get("limit") || "10", 10);
     const includePending = url.searchParams.get("includePending") === "1";
     const user = includePending ? await getCurrentUser() : null;
-    if (includePending && user?.role !== "admin") {
+    if (includePending && !user) {
       return NextResponse.json(
-        { ok: false, error: "无权限" },
-        { status: user ? 403 : 401 }
+        { ok: false, error: "未登录" },
+        { status: 401 }
       );
     }
 
@@ -59,10 +58,10 @@ export async function PATCH(req: NextRequest) {
     if (csrf) return csrf;
 
     const user = await getCurrentUser();
-    if (user?.role !== "admin") {
+    if (!user) {
       return NextResponse.json(
-        { ok: false, error: "无权限" },
-        { status: user ? 403 : 401 }
+        { ok: false, error: "未登录" },
+        { status: 401 }
       );
     }
 
@@ -160,9 +159,9 @@ export async function DELETE(req: NextRequest) {
     const id = url.searchParams.get("id");
 
     const user = await getCurrentUser();
-    if (user?.role !== "admin" && !isLegacyAdminRequest(req)) {
+    if (!user) {
       return NextResponse.json(
-        { ok: false, error: "未授权" },
+        { ok: false, error: "未登录" },
         { status: 401 }
       );
     }

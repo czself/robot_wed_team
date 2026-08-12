@@ -57,13 +57,13 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <div>
               <div className="font-bold text-white">{user.name}</div>
               <div className="text-xs text-rm-gray">
-                {user.group} · {user.role === "admin" ? "管理员" : "队员"}
+                {user.group} · 队员
               </div>
             </div>
           </div>
           <div className="inline-flex items-center gap-2 text-xs text-rm-gray">
             <Users className="h-4 w-4 text-rm-blue" />
-            {user.email}
+            {user.username}
           </div>
         </div>
 

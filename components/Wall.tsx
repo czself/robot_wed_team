@@ -311,7 +311,7 @@ export default function Wall() {
       setSort("new");
       await refresh();
       setError(null);
-      setNotice("留言已提交，管理员审核后会显示在留言墙。");
+      setNotice("留言已提交，队员审核后会显示在留言墙。");
     } catch (e) {
       setError((e as Error).message);
     } finally {

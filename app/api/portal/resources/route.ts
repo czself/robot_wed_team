@@ -6,7 +6,7 @@ import {
   updateResource,
   validateResourceInput,
 } from "@/lib/resources";
-import { currentApiAdmin, currentApiUser } from "@/lib/api-auth";
+import { currentApiUser } from "@/lib/api-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
     const result = validateResourceInput(body);
@@ -55,7 +55,7 @@ export async function PATCH(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
     const id = typeof body?.id === "string" ? body.id : "";
@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiAdmin();
+    const auth = await currentApiUser();
     if (!auth.ok) return auth.response;
     const id = new URL(req.url).searchParams.get("id") || "";
     if (!id) {

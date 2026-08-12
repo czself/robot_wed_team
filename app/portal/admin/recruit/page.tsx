@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function PortalRecruitAdminPage() {
-  const user = await requireUser();
+  await requireUser();
 
-  return <RecruitAdmin canDelete={user.role === "admin"} />;
+  return <RecruitAdmin canDelete />;
 }
