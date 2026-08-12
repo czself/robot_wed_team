@@ -1,5 +1,5 @@
 import RecruitAdmin from "@/components/RecruitAdmin";
-import { requireAdmin } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function PortalRecruitAdminPage() {
-  await requireAdmin();
+  const user = await requireUser();
 
-  return <RecruitAdmin requireManualKey={false} />;
+  return <RecruitAdmin canDelete={user.role === "admin"} />;
 }

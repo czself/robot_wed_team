@@ -1,6 +1,6 @@
 import AdminWallManager from "@/components/AdminWallManager";
 import { listMessages } from "@/lib/wall";
-import { requireAdmin } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,14 @@ export const metadata = {
 };
 
 export default async function PortalWallAdminPage() {
-  await requireAdmin();
-  const result = await listMessages({ sort: "new", offset: 0, limit: 50 });
+  const user = await requireUser();
+  const isAdmin = user.role === "admin";
+  const result = await listMessages({
+    sort: "new",
+    offset: 0,
+    limit: 50,
+    includePending: isAdmin,
+  });
 
-  return <AdminWallManager initialMessages={result.data} />;
+  return <AdminWallManager initialMessages={result.data} canDelete={isAdmin} />;
 }

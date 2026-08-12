@@ -5,14 +5,15 @@ import AdminResourceManager from "@/components/AdminResourceManager";
 import AdminUserCreator from "@/components/AdminUserCreator";
 import { listUsers } from "@/lib/auth";
 import { listResources } from "@/lib/resources";
-import { requireAdmin } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalAdminPage() {
-  await requireAdmin();
-  const users = await listUsers();
-  const resources = await listResources();
+  const user = await requireUser();
+  const isAdmin = user.role === "admin";
+  const users = isAdmin ? await listUsers() : [];
+  const resources = isAdmin ? await listResources() : [];
 
   return (
     <div className="space-y-8">
@@ -21,9 +22,9 @@ export default async function PortalAdminPage() {
           <p className="mb-3 text-xs uppercase tracking-[0.28em] text-rm-red">
             Admin Console
           </p>
-          <h2 className="text-3xl font-black text-white md:text-5xl">管理后台</h2>
+          <h2 className="text-3xl font-black text-white md:text-5xl">队内后台</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-rm-gray">
-            第一阶段包含账号创建、资料索引维护和报名记录入口。
+            队员可查看报名记录和留言；管理员可以创建账号、维护资料和删除数据。
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -44,9 +45,20 @@ export default async function PortalAdminPage() {
         </div>
       </div>
 
-      <AdminUserCreator initialUsers={users} />
-      <AdminResourceCreator />
-      <AdminResourceManager initialResources={resources} />
+      {isAdmin ? (
+        <>
+          <AdminUserCreator initialUsers={users} />
+          <AdminResourceCreator />
+          <AdminResourceManager initialResources={resources} />
+        </>
+      ) : (
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] px-5 py-12 text-center">
+          <h3 className="text-xl font-black text-white">当前为队员权限</h3>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-rm-gray">
+            你可以查看报名记录和留言内容。账号创建、资料维护和删除操作仅管理员可用。
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpen, ClipboardList, Database, ShieldCheck } from "lucide-react";
+import PasswordChangeForm from "@/components/PasswordChangeForm";
 import { requireUser } from "@/lib/session";
 import { listResources } from "@/lib/resources";
 
@@ -25,11 +26,10 @@ const modules = [
     icon: Database,
   },
   {
-    title: "管理后台",
-    desc: "管理员创建账号、维护资料、查看报名记录。",
+    title: "队内后台",
+    desc: "队员查看报名和留言，管理员维护账号和资料。",
     href: "/portal/admin",
     icon: ShieldCheck,
-    adminOnly: true,
   },
 ];
 
@@ -71,7 +71,6 @@ export default async function PortalPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {modules
-          .filter((item) => !item.adminOnly || user.role === "admin")
           .map((item) => {
             const Icon = item.icon;
             return (
@@ -91,6 +90,10 @@ export default async function PortalPage() {
               </Link>
             );
           })}
+      </div>
+
+      <div className="mt-6">
+        <PasswordChangeForm />
       </div>
     </div>
   );

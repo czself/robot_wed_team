@@ -228,6 +228,29 @@ export async function deleteUser(
   return { deleted: true };
 }
 
+export async function changeOwnPassword(input: {
+  userId: string;
+  currentPassword: string;
+  nextPassword: string;
+}): Promise<void> {
+  const user = await getUserById(input.userId);
+  if (!user || user.status !== "active") throw new Error("账号不存在");
+  if (input.nextPassword.length < 6 || input.nextPassword.length > 72) {
+    throw new Error("新密码长度应为 6-72 位");
+  }
+  if (input.currentPassword === input.nextPassword) {
+    throw new Error("新密码不能与当前密码相同");
+  }
+
+  const valid = await verifyPassword(input.currentPassword, user.passwordHash);
+  if (!valid) throw new Error("当前密码不正确");
+
+  await kv.set(userKey(user.id), {
+    ...user,
+    passwordHash: await hashPassword(input.nextPassword),
+  });
+}
+
 export async function authenticateUser(email: string, password: string): Promise<TeamUser | null> {
   const user = await getUserByEmail(email);
   if (!user || user.status !== "active") return null;

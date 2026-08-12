@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Eye, Lock, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Download, Eye, RefreshCw, Search, Trash2 } from "lucide-react";
 
 interface RecruitEntry {
   id: string;
@@ -37,11 +37,10 @@ function csvCell(value: unknown): string {
 }
 
 export default function RecruitAdmin({
-  requireManualKey = true,
+  canDelete = true,
 }: {
-  requireManualKey?: boolean;
+  canDelete?: boolean;
 }) {
-  const [adminKey, setAdminKey] = useState("");
   const [entries, setEntries] = useState<RecruitEntry[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,19 +70,10 @@ export default function RecruitAdmin({
   }, [entries]);
 
   const loadEntries = async () => {
-    if (requireManualKey && !adminKey.trim()) {
-      setError("请输入管理密码");
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
-      const headers: HeadersInit = {};
-      if (adminKey.trim()) headers.Authorization = `Bearer ${adminKey.trim()}`;
-
       const res = await fetch("/api/recruit", {
-        headers,
         cache: "no-store",
       });
       const json = await res.json().catch(() => null);
@@ -126,6 +116,7 @@ export default function RecruitAdmin({
   };
 
   const deleteEntry = async (entry: RecruitEntry) => {
+    if (!canDelete) return;
     if (deletingId) return;
     const ok = window.confirm(`确认删除 ${entry.name} 的报名记录？`);
     if (!ok) return;
@@ -133,12 +124,8 @@ export default function RecruitAdmin({
     setDeletingId(entry.id);
     setError(null);
     try {
-      const headers: HeadersInit = {};
-      if (adminKey.trim()) headers.Authorization = `Bearer ${adminKey.trim()}`;
-
       const res = await fetch(`/api/recruit?id=${encodeURIComponent(entry.id)}`, {
         method: "DELETE",
-        headers,
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.ok) {
@@ -163,7 +150,7 @@ export default function RecruitAdmin({
             报名记录
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-rm-gray">
-            这里读取的是提交成功后写入 KV 的完整名单，QQ 邮箱只是提醒。
+            队员登录后可查看提交成功写入 KV 的完整名单，管理员可删除误填或测试记录。
           </p>
         </div>
 
@@ -185,28 +172,9 @@ export default function RecruitAdmin({
 
       <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.03] p-4">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)_auto_auto]">
-          {requireManualKey ? (
-            <label className="relative block">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
-              <input
-                type="password"
-                value={adminKey}
-                onChange={(e) => {
-                  setAdminKey(e.target.value);
-                  setError(null);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") loadEntries();
-                }}
-                placeholder="ADMIN_KEY"
-                className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/80 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-red/50"
-              />
-            </label>
-          ) : (
-            <div className="flex h-11 items-center rounded-lg border border-white/10 bg-rm-dark/80 px-3 text-sm text-rm-gray">
-              已使用管理员登录态
-            </div>
-          )}
+          <div className="flex h-11 items-center rounded-lg border border-white/10 bg-rm-dark/80 px-3 text-sm text-rm-gray">
+            已使用队员登录态
+          </div>
 
           <label className="relative block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
@@ -279,7 +247,7 @@ export default function RecruitAdmin({
                 <th className="px-4 py-3">邮箱</th>
                 <th className="px-4 py-3">组别</th>
                 <th className="px-4 py-3">备注</th>
-                <th className="px-4 py-3 text-right">操作</th>
+                {canDelete && <th className="px-4 py-3 text-right">操作</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -304,21 +272,23 @@ export default function RecruitAdmin({
                   <td className="max-w-xs px-4 py-3 text-rm-gray">
                     {entry.note || "-"}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => deleteEntry(entry)}
-                      disabled={deletingId === entry.id}
-                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-rm-red/30 bg-rm-red/10 px-3 text-xs font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {deletingId === entry.id ? (
-                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-3.5 w-3.5" />
-                      )}
-                      删除
-                    </button>
-                  </td>
+                  {canDelete && (
+                    <td className="whitespace-nowrap px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => deleteEntry(entry)}
+                        disabled={deletingId === entry.id}
+                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-rm-red/30 bg-rm-red/10 px-3 text-xs font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deletingId === entry.id ? (
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                        删除
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -348,19 +318,21 @@ export default function RecruitAdmin({
                 <div>邮箱：{entry.email}</div>
                 <div>备注：{entry.note || "-"}</div>
               </div>
-              <button
-                type="button"
-                onClick={() => deleteEntry(entry)}
-                disabled={deletingId === entry.id}
-                className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-rm-red/30 bg-rm-red/10 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {deletingId === entry.id ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-                删除记录
-              </button>
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={() => deleteEntry(entry)}
+                  disabled={deletingId === entry.id}
+                  className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-rm-red/30 bg-rm-red/10 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {deletingId === entry.id ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                  删除记录
+                </button>
+              )}
             </article>
           ))}
         </div>
@@ -373,7 +345,7 @@ export default function RecruitAdmin({
 
         {!loaded && (
           <div className="px-4 py-16 text-center text-sm text-rm-gray">
-            {requireManualKey ? "输入 ADMIN_KEY 后查看报名名单" : "点击查看后读取报名名单"}
+            点击查看后读取报名名单
           </div>
         )}
       </div>

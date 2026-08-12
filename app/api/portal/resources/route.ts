@@ -7,6 +7,7 @@ import {
   validateResourceInput,
 } from "@/lib/resources";
 import { currentApiAdmin, currentApiUser } from "@/lib/api-auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,6 +28,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const auth = await currentApiAdmin();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
@@ -48,6 +52,9 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const auth = await currentApiAdmin();
     if (!auth.ok) return auth.response;
     const body = await req.json().catch(() => null);
@@ -72,6 +79,9 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const auth = await currentApiAdmin();
     if (!auth.ok) return auth.response;
     const id = new URL(req.url).searchParams.get("id") || "";

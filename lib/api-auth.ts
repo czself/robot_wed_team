@@ -32,3 +32,10 @@ export async function currentApiAdmin(): Promise<
   }
   return auth;
 }
+
+export async function currentApiMember(): Promise<
+  | { ok: true; user: PublicTeamUser }
+  | { ok: false; response: NextResponse }
+> {
+  return currentApiUser();
+}

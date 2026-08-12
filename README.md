@@ -3,7 +3,7 @@
 这是 YZ Control RoboMaster 战队官网。项目分为公开官网和队员门户两部分：
 
 - 公开官网：战队介绍、技术星图、机器人展示、招新报名、留言墙。
-- 队员门户：登录后查看队内资料、项目索引、管理员后台和报名记录。
+- 队员门户：登录后查看队内资料、项目索引、队内后台、报名记录和留言记录。
 
 ## 技术栈
 
@@ -32,7 +32,7 @@ TEAM_ADMIN_EMAIL=admin@yz-control.local
 TEAM_ADMIN_PASSWORD=change-this-password
 ```
 
-兼容旧后台和留言删除接口。默认不启用 Bearer `ADMIN_KEY` 管理权限；确实需要过渡时显式打开：
+旧版 Bearer `ADMIN_KEY` 只建议作为过渡或应急通道。默认不启用；确实需要时显式打开：
 
 ```bash
 ADMIN_KEY=legacy-admin-key
@@ -55,7 +55,8 @@ Vercel KV 变量由 Vercel 绑定提供，或在本地按 `@vercel/kv` 要求配
 
 - 队内资料不要放在 `public/`，否则知道路径的人都能访问。
 - `/portal/*` 需要队员登录。
-- `/portal/admin/*` 需要管理员账号。
+- `/portal/admin/*` 使用队员账号登录；队员可查看报名记录和留言记录。
+- 删除报名/留言、创建账号、维护资料仅管理员账号可用。
 - 管理员创建队员账号，不开放游客自助注册。
 
 ## 验证

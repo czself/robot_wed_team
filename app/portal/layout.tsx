@@ -8,7 +8,7 @@ import { requireUser } from "@/lib/session";
 const navItems = [
   { href: "/portal", label: "总览", icon: FolderKanban },
   { href: "/portal/docs", label: "资料库", icon: BookOpen },
-  { href: "/portal/admin", label: "管理", icon: Shield, adminOnly: true },
+  { href: "/portal/admin", label: "后台", icon: Shield },
 ];
 
 export default async function PortalLayout({ children }: { children: ReactNode }) {
@@ -30,7 +30,6 @@ export default async function PortalLayout({ children }: { children: ReactNode }
 
           <div className="flex flex-wrap items-center gap-2">
             {navItems
-              .filter((item) => !item.adminOnly || user.role === "admin")
               .map((item) => {
                 const Icon = item.icon;
                 return (

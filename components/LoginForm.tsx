@@ -44,7 +44,7 @@ export default function LoginForm() {
         </p>
         <h1 className="text-3xl font-black text-white">队员登录</h1>
         <p className="mt-3 text-sm leading-7 text-rm-gray">
-          游客可以继续浏览公开官网。队员登录后可查看训练资料、项目文档和管理入口。
+          游客可以继续浏览公开官网。队员和管理员统一从这里登录，登录后可查看队内资料和后台记录。
         </p>
 
         <div className="mt-7 space-y-4">
@@ -54,7 +54,7 @@ export default function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
-              placeholder="队员邮箱"
+              placeholder="队员邮箱 / 管理员邮箱"
               className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/70 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-blue/50"
             />
           </label>

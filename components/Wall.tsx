@@ -182,6 +182,7 @@ export default function Wall() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("hot");
   const [page, setPage] = useState(0);
 
@@ -291,6 +292,7 @@ export default function Wall() {
   const handleSubmit = async () => {
     if (!content.trim() || submitting) return;
     setSubmitting(true);
+    setNotice(null);
     try {
       const res = await fetch("/api/wall", {
         method: "POST",
@@ -308,6 +310,8 @@ export default function Wall() {
       setPage(0);
       setSort("new");
       await refresh();
+      setError(null);
+      setNotice("留言已提交，管理员审核后会显示在留言墙。");
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -413,6 +417,12 @@ export default function Wall() {
           </button>
         </div>
       </div>
+
+      {notice && (
+        <div className="mb-3 rounded-lg border border-rm-blue/30 bg-rm-blue/10 px-4 py-3 text-sm text-rm-blue">
+          {notice}
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-16 text-rm-gray text-sm">

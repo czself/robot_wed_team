@@ -1,4 +1,4 @@
-import RecruitAdmin from "@/components/RecruitAdmin";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -7,9 +7,5 @@ export const metadata = {
 };
 
 export default function RecruitAdminPage() {
-  return (
-    <div className="min-h-screen bg-[#070707] pt-24 pb-16">
-      <RecruitAdmin />
-    </div>
-  );
+  redirect("/portal/admin/recruit");
 }

@@ -7,6 +7,7 @@ export interface WallMessage {
   createdAt: number;
   likes: number;
   parentId: string | null;
+  status?: "pending" | "approved";
 }
 
 export interface WallMessageWithReplies extends WallMessage {
@@ -37,6 +38,7 @@ export async function listMessages(opts?: {
   sort?: SortKey;
   offset?: number;
   limit?: number;
+  includePending?: boolean;
 }): Promise<{
   data: WallMessageWithReplies[];
   total: number;
@@ -56,8 +58,12 @@ export async function listMessages(opts?: {
     }
   }
 
+  const visibleMessages = opts?.includePending
+    ? messages
+    : messages.filter((m) => (m.status ?? "approved") === "approved");
+
   const byId = new Map<string, WallMessageWithReplies>(
-    messages.map((m) => [
+    visibleMessages.map((m) => [
       m.id,
       { ...m, replies: [] as WallMessageWithReplies[] },
     ])
@@ -100,10 +106,21 @@ export async function createMessage(input: {
     createdAt: Date.now(),
     likes: 0,
     parentId: input.parentId || null,
+    status: "pending",
   };
   await kv.lpush(MSG_KEY, msg.id);
   await kv.set(`${META_PREFIX}${msg.id}`, msg);
   return msg;
+}
+
+export async function approveMessage(id: string): Promise<WallMessage> {
+  const metaKey = `${META_PREFIX}${id}`;
+  const raw = (await kv.get(metaKey)) as WallMessage | null;
+  if (!raw) throw new Error("留言不存在");
+
+  const next: WallMessage = { ...raw, status: "approved" };
+  await kv.set(metaKey, next);
+  return next;
 }
 
 export async function likeMessage(
@@ -134,9 +151,23 @@ export async function deleteMessage(id: string): Promise<{ deleted: boolean }> {
   const raw = await kv.get(metaKey);
   if (!raw) return { deleted: false };
 
-  await kv.del(metaKey);
-  await kv.del(`${LIKES_PREFIX}${id}`);
-  await kv.lrem(MSG_KEY, 0, id);
+  const ids = await kv.lrange(MSG_KEY, 0, -1);
+  const metas = ids.length
+    ? ((await kv.mget(...ids.map((msgId) => `${META_PREFIX}${msgId}`))) as Array<WallMessage | null>)
+    : [];
+  const childIds = metas
+    .filter((message): message is WallMessage => Boolean(message))
+    .filter((message) => message.parentId === id)
+    .map((message) => message.id);
+  const idsToDelete = [id, ...childIds];
+
+  await Promise.all(
+    idsToDelete.flatMap((msgId) => [
+      kv.del(`${META_PREFIX}${msgId}`),
+      kv.del(`${LIKES_PREFIX}${msgId}`),
+      kv.lrem(MSG_KEY, 0, msgId),
+    ])
+  );
 
   return { deleted: true };
 }

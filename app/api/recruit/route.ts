@@ -7,8 +7,8 @@ import {
   deleteEntry,
 } from "@/lib/recruit";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { getCurrentUser } from "@/lib/session";
-import { isLegacyAdminRequest } from "@/lib/legacy-admin";
+import { currentApiAdmin } from "@/lib/api-auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,20 +19,10 @@ function clientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip") || "anon";
 }
 
-async function isAdmin(req: NextRequest): Promise<boolean> {
-  const user = await getCurrentUser();
-  if (user?.role === "admin") return true;
-  return isLegacyAdminRequest(req);
-}
-
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    if (!(await isAdmin(req))) {
-      return NextResponse.json(
-        { ok: false, error: "未授权" },
-        { status: 401 }
-      );
-    }
+    const auth = await currentApiAdmin();
+    if (!auth.ok) return auth.response;
 
     const entries = await listEntries();
     entries.sort((a, b) => b.createdAt - a.createdAt);
@@ -80,12 +70,11 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    if (!(await isAdmin(req))) {
-      return NextResponse.json(
-        { ok: false, error: "未授权" },
-        { status: 401 }
-      );
-    }
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
+    const auth = await currentApiAdmin();
+    if (!auth.ok) return auth.response;
 
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
