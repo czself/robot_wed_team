@@ -1,35 +1,35 @@
 import Link from "next/link";
-import { BookOpen, ClipboardList, Database, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  ClipboardList,
+  KeyRound,
+  MessageSquare,
+  ShieldCheck,
+} from "lucide-react";
 import PasswordChangeForm from "@/components/PasswordChangeForm";
 import { requireUser } from "@/lib/session";
 import { listResources } from "@/lib/resources";
 
 export const dynamic = "force-dynamic";
 
-const modules = [
+const primaryModules = [
   {
     title: "资料库",
-    desc: "沉淀训练路线、项目链接、规范和复盘资料。",
+    desc: "训练路线、项目链接、规范和复盘资料统一从这里找。",
     href: "/portal/docs",
     icon: BookOpen,
   },
   {
-    title: "训练任务",
-    desc: "第一阶段预留模块，后续接入任务分配和进度记录。",
-    href: "/portal/docs?level=入门",
+    title: "报名记录",
+    desc: "查看招新报名名单，按姓名、组别、电话快速搜索。",
+    href: "/portal/admin/recruit",
     icon: ClipboardList,
   },
   {
-    title: "项目资料",
-    desc: "机器人项目、赛季文档、调试记录统一入口。",
-    href: "/portal/docs?level=项目",
-    icon: Database,
-  },
-  {
-    title: "队内后台",
-    desc: "队员维护账号、报名、留言和资料。",
-    href: "/portal/admin",
-    icon: ShieldCheck,
+    title: "留言管理",
+    desc: "查看留言墙内容，处理待审核或不合适的留言。",
+    href: "/portal/admin/wall",
+    icon: MessageSquare,
   },
 ];
 
@@ -38,21 +38,31 @@ export default async function PortalPage() {
   const resources = await listResources();
 
   return (
-    <div>
-      <section className="mb-10">
-        <p className="mb-4 text-sm uppercase tracking-[0.3em]">
-          <span className="text-rm-red">Team</span>{" "}
-          <span className="text-rm-blue">Workspace</span>
+    <div className="space-y-8">
+      <section className="rounded-lg border border-white/10 bg-white/[0.03] p-5 md:p-7">
+        <p className="mb-3 text-xs uppercase tracking-[0.28em] text-rm-blue">
+          Team Workspace
         </p>
-        <h2 className="max-w-3xl text-3xl font-black leading-tight text-white md:text-5xl">
-          从招新官网升级为
-          <span className="block bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
-            战队长期资料中枢
-          </span>
-        </h2>
+        <div className="grid gap-5 lg:grid-cols-[1fr_320px] lg:items-end">
+          <div>
+            <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">
+              队员工作台
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-rm-gray">
+              这里放队员每天真正会用的入口：资料、报名记录、留言管理。账号和资料维护放在后台管理里，不再混在总览里。
+            </p>
+          </div>
+          <Link
+            href="/portal/admin"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-rm-red/40 bg-rm-red/10 px-5 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            进入后台管理
+          </Link>
+        </div>
       </section>
 
-      <div className="mb-10 grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
           <div className="font-mono text-3xl font-black text-white">{resources.length}</div>
           <div className="mt-1 text-sm text-rm-gray">资料条目</div>
@@ -69,8 +79,13 @@ export default async function PortalPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {modules
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-black text-white">常用入口</h3>
+          <div className="text-xs text-rm-gray">按使用频率排序</div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+        {primaryModules
           .map((item) => {
             const Icon = item.icon;
             return (
@@ -85,16 +100,21 @@ export default async function PortalPage() {
                 <h3 className="text-lg font-black text-white">{item.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-rm-gray">{item.desc}</p>
                 <div className="mt-5 text-xs font-bold text-rm-blue transition-transform group-hover:translate-x-1">
-                  进入 →
+                  打开 →
                 </div>
               </Link>
             );
           })}
-      </div>
+        </div>
+      </section>
 
-      <div className="mt-6">
+      <section>
+        <div className="mb-4 flex items-center gap-2">
+          <KeyRound className="h-4 w-4 text-rm-blue" />
+          <h3 className="text-lg font-black text-white">个人设置</h3>
+        </div>
         <PasswordChangeForm />
-      </div>
+      </section>
     </div>
   );
 }
