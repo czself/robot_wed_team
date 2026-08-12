@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://yz-control.top"),
   title: "YZ Control | RoboMaster 2026",
   description:
-    "YZ Control — RoboMaster 2026 步兵对抗赛国二、3v3 国三。步兵、工程、哨兵三台机器人，从 STM32 嵌入式到视觉自瞄，我们用代码和钢铁征服赛场。",
+    "YZ Control — RoboMaster 2026 步兵对抗赛国二、3v3 国三。步兵、英雄、哨兵三台机器人，从 STM32 嵌入式到视觉自瞄，我们用代码和钢铁征服赛场。",
   keywords: ["RoboMaster", "3v3", "步兵对抗赛", "YZ Control", "机器人", "战队", "招新", "RM2026"],
   openGraph: {
     title: "YZ Control | 豫章师范学院 RoboMaster 战队",

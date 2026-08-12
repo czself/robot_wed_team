@@ -14,7 +14,7 @@ const techTree: TechNode[] = [
   {
     id: "rm2026",
     label: "RM2026",
-    description: "RoboMaster 2026 赛季 3v3 对抗，步兵/工程/哨兵三台机器人协同作战",
+    description: "RoboMaster 2026 赛季 3v3 对抗，步兵/英雄/哨兵三台机器人协同作战",
     children: [
       {
         id: "embedded",
@@ -46,7 +46,7 @@ const techTree: TechNode[] = [
           { id: "yolo", label: "YOLOv8", description: "装甲板实时检测与识别" },
           { id: "tensorrt", label: "TensorRT", description: "边缘端模型推理加速" },
           { id: "opencv", label: "OpenCV", description: "相机标定与图像处理管线" },
-          { id: "rl", label: "强化学习", description: "哨兵自主巡逻与决策策略" },
+          { id: "strategy", label: "Strategy", description: "哨兵自主巡逻、路径规划与策略决策" },
         ],
       },
     ],

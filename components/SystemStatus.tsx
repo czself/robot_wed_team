@@ -7,7 +7,7 @@ const statusItems = [
   { label: "LAST BATTLE", value: "2026.04", state: "上海站", color: "text-rm-blue" },
   { label: "INFANTRY", value: "步兵对抗赛", state: "国二", color: "text-yellow-400" },
   { label: "SQUAD", value: "3v3 对抗赛", state: "国三", color: "text-green-400" },
-  { label: "ROBOTS", value: "步兵/工程/哨兵", state: "3台", color: "text-rm-blue" },
+  { label: "ROBOTS", value: "步兵/英雄/哨兵", state: "3台", color: "text-rm-blue" },
   { label: "MEMBERS", value: "YZ Control", state: "Recruiting", color: "text-rm-red" },
 ];
 

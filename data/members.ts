@@ -37,8 +37,8 @@ export const teamGroups: TeamGroup[] = [
     name: "算法组",
     nameEn: "Algorithm",
     icon: "🧠",
-    description: "战场上的决策大脑。哨兵自主巡逻、路径规划、强化学习，让机器人学会独立思考。",
-    skills: ["ROS2", "SLAM", "强化学习", "路径规划", "C++"],
+    description: "战场上的决策大脑。哨兵自主巡逻、路径规划与策略决策，让机器人稳定完成场上任务。",
+    skills: ["ROS2", "SLAM", "策略决策", "路径规划", "C++"],
   },
   {
     id: "operations",

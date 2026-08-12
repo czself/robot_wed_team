@@ -14,9 +14,9 @@ export const robots: Robot[] = [
     name: "Hero",
     nameCn: "英雄机器人",
     description:
-      "3v3 赛场上的火力核心。大弹丸高伤害发射器 + 双轴云台精准打击，一击制胜的重炮手，在关键时刻扭转战局。",
+      "3v3 赛场上的火力核心。42mm 大弹丸发射器 + 双轴云台精准打击，在关键时刻扭转战局。",
     specs: [
-      { label: "弹丸类型", value: "17mm 高伤弹" },
+      { label: "弹丸类型", value: "42mm 大弹丸" },
       { label: "云台响应", value: "1 kHz INS" },
       { label: "底盘电机", value: "4×M3508" },
       { label: "云台电机", value: "2×GM6020" },
@@ -58,14 +58,14 @@ export const robots: Robot[] = [
     name: "Sentry",
     nameCn: "哨兵机器人",
     description:
-      "3v3 赛场上的自动防线。全自动巡逻与目标追踪，无需操作手操控，独立守护基地安全。",
+      "3v3 赛场上的自动防线。自主巡逻、目标识别与策略决策协同工作，独立守护基地安全。",
     specs: [
       { label: "巡逻速度", value: "~2 m/s" },
       { label: "追踪精度", value: "±2°" },
-      { label: "自主决策", value: "强化学习" },
+      { label: "自主决策", value: "导航与策略" },
       { label: "底盘电机", value: "4×M3508" },
     ],
-    tags: ["强化学习", "TensorRT", "自动巡逻", "目标追踪"],
+    tags: ["路径规划", "TensorRT", "自动巡逻", "目标追踪"],
     images: [
       "/images/robots/sentry-1.png",
       "/images/robots/sentry-2.png",
