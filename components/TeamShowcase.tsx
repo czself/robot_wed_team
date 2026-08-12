@@ -1,7 +1,31 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { rmul2026Teams, getRegionColor, regions } from "@/data/rmul2026";
+import { rmul2026Teams, regions } from "@/data/rmul2026";
+
+const rowWidths = [
+  "w-[86%] md:w-[70%]",
+  "w-[94%] md:w-[82%]",
+  "w-[78%] md:w-[62%]",
+  "w-[100%] md:w-[88%]",
+  "w-[88%] md:w-[74%]",
+  "w-[96%] md:w-[80%]",
+  "w-[82%] md:w-[66%]",
+  "w-[100%] md:w-[92%]",
+  "w-[90%] md:w-[76%]",
+];
+
+const rowOffsets = [
+  "ml-0",
+  "ml-auto",
+  "ml-[8%] md:ml-[14%]",
+  "ml-0",
+  "ml-auto",
+  "ml-[4%] md:ml-[10%]",
+  "ml-auto",
+  "ml-0",
+  "ml-[6%] md:ml-[12%]",
+];
 
 function shuffleTeams<T>(arr: T[], seed: number): T[] {
   const a = [...arr];
@@ -16,22 +40,28 @@ function MarqueeRow({
   items,
   speed,
   direction,
-  color,
+  accent,
   paused,
   onHover,
+  widthClass,
+  offsetClass,
 }: {
   items: { school: string; team: string }[];
   speed: number;
   direction: "left" | "right";
-  color: string;
+  accent: "red" | "blue";
   paused: boolean;
   onHover: (hovered: boolean) => void;
+  widthClass: string;
+  offsetClass: string;
 }) {
   const doubled = useMemo(() => [...items, ...items], [items]);
+  const isRed = accent === "red";
+  const accentColor = isRed ? "#D90429" : "#00C8FF";
 
   return (
     <div
-      className="overflow-hidden whitespace-nowrap py-2.5"
+      className={`overflow-hidden whitespace-nowrap py-2.5 ${widthClass} ${offsetClass}`}
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
     >
@@ -53,9 +83,12 @@ function MarqueeRow({
                 isHighlight
                   ? { borderColor: "#D90429" }
                   : {
-                      color,
-                      borderColor: `${color}33`,
-                      backgroundColor: `${color}0A`,
+                      color: accentColor,
+                      borderColor: `${accentColor}40`,
+                      background: isRed
+                        ? "linear-gradient(90deg, rgba(217,4,41,0.12), rgba(217,4,41,0.03))"
+                        : "linear-gradient(90deg, rgba(0,200,255,0.12), rgba(0,200,255,0.03))",
+                      boxShadow: `0 0 18px ${accentColor}12`,
                     }
               }
             >
@@ -95,7 +128,7 @@ export default function TeamShowcase() {
   }, []);
 
   const rows = useMemo(() => {
-    const result: { items: { school: string; team: string }[]; speed: number; direction: "left" | "right"; color: string; region: string }[] = [];
+    const result: { items: { school: string; team: string }[]; speed: number; direction: "left" | "right"; region: string; accent: "red" | "blue"; widthClass: string; offsetClass: string }[] = [];
 
     const regionNames = Object.keys(teamsByRegion);
     for (let i = 0; i < regionNames.length; i++) {
@@ -103,10 +136,12 @@ export default function TeamShowcase() {
       const teams = teamsByRegion[region];
       result.push({
         items: shuffleTeams(teams, i + 1),
-        speed: 60 + teams.length * 2,
+        speed: 54 + teams.length * 2 + (i % 3) * 6,
         direction: i % 2 === 0 ? "left" : "right",
-        color: getRegionColor(region),
         region,
+        accent: i % 2 === 0 ? "red" : "blue",
+        widthClass: rowWidths[i % rowWidths.length],
+        offsetClass: rowOffsets[i % rowOffsets.length],
       });
     }
 
@@ -117,7 +152,7 @@ export default function TeamShowcase() {
   const totalRegions = regions.length;
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section id="teams" className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-15" />
 
       {/* 豫章师范学院 - 突出展示 */}
@@ -162,19 +197,31 @@ export default function TeamShowcase() {
         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
 
         {rows.map((row, idx) => (
-          <div key={row.region} className="relative">
+          <div key={row.region} className="relative py-1.5">
             <div
-              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-[10px] tracking-widest uppercase pointer-events-none transition-opacity duration-300"
-              style={{ color: row.color, opacity: hoveredRow === idx ? 0.3 : 0.6 }}
+              className="relative z-20 mb-1 ml-4 md:ml-8 inline-flex items-center gap-2 rounded border bg-[#0A0A0A]/85 px-2.5 py-1 text-[10px] font-bold tracking-widest shadow-lg backdrop-blur-sm transition-opacity duration-300"
+              style={{
+                color: row.accent === "red" ? "#ff4d6a" : "#00C8FF",
+                borderColor: row.accent === "red" ? "#D904294D" : "#00C8FF4D",
+                opacity: hoveredRow === idx ? 1 : 0.9,
+              }}
             >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  backgroundColor: row.accent === "red" ? "#D90429" : "#00C8FF",
+                }}
+              />
               {row.region}
             </div>
             <MarqueeRow
               items={row.items}
               speed={row.speed}
               direction={row.direction}
-              color={row.color}
+              accent={row.accent}
               paused={hoveredRow === idx}
+              widthClass={row.widthClass}
+              offsetClass={row.offsetClass}
               onHover={(hovered) => setHoveredRow(hovered ? idx : null)}
             />
           </div>

@@ -23,10 +23,10 @@ interface Particle {
 function createParticles(width: number, height: number): Particle[] {
   return Array.from({ length: 20 }, (_, i) => ({
     id: i,
-    x: Math.random() * width,
-    y: Math.random() * height,
-    duration: 3 + Math.random() * 4,
-    delay: Math.random() * 5,
+    x: (((i * 37 + 11) % 100) / 100) * width,
+    y: (((i * 53 + 19) % 100) / 100) * height,
+    duration: 3 + (i % 5) * 0.8,
+    delay: (i % 7) * 0.7,
   }));
 }
 
@@ -73,7 +73,7 @@ export default function Hero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/hero-bg.jpg"
+          src="/hero-bg.jpg"
           alt=""
           fill
           className="object-cover"
@@ -97,23 +97,14 @@ export default function Hero() {
 
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         {particles.map((p) => (
-          <motion.div
+          <span
             key={p.id}
-            className={`absolute w-1 h-1 rounded-full ${p.id % 2 === 0 ? "bg-rm-red/40" : "bg-rm-blue/40"}`}
-            initial={{
-              x: p.x,
-              y: p.y,
-              opacity: 0,
-            }}
-            animate={{
-              y: [null, -100],
-              opacity: [0, 0.8, 0],
-            }}
-            transition={{
-              duration: p.duration,
-              repeat: Infinity,
-              delay: p.delay,
-              ease: "linear",
+            className={`hero-particle absolute w-1 h-1 rounded-full ${p.id % 2 === 0 ? "bg-rm-red/40" : "bg-rm-blue/40"}`}
+            style={{
+              left: p.x,
+              top: p.y,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
             }}
           />
         ))}
