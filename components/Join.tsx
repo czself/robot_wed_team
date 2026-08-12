@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { teamGroups, recruitmentLinks } from "@/data/members";
 
@@ -79,6 +80,22 @@ export default function Join() {
           >
             加入我们 →
           </a>
+
+          <div className="mt-10 inline-flex flex-col items-center gap-4 rounded-xl border border-white/5 bg-white/[0.02] p-6 card-hover">
+            <Image
+              src="/images/qq-group-qr.jpg"
+              alt="YZ Control QQ 群二维码"
+              width={144}
+              height={144}
+              className="w-36 h-36 rounded-lg border border-white/10 bg-white p-2"
+            />
+            <p className="text-sm text-rm-gray">
+              QQ群：
+              <span className="text-white font-bold tracking-wider">
+                484851368
+              </span>
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>
