@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { LogIn, UserRound } from "lucide-react";
 
 const navLinks = [
   { label: "首页", href: "/" },
@@ -14,11 +15,25 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/me", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((json) => {
+        if (!cancelled) setLoggedIn(Boolean(json?.data));
+      })
+      .catch(() => null);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -66,6 +81,13 @@ export default function Navbar() {
             className="px-5 py-2 bg-rm-red hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
           >
             加入我们
+          </Link>
+          <Link
+            href={loggedIn ? "/portal" : "/login"}
+            className="inline-flex items-center gap-2 px-5 py-2 border border-white/15 hover:border-rm-red/50 text-white text-sm font-medium rounded transition-colors"
+          >
+            {loggedIn ? <UserRound className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+            {loggedIn ? "队员空间" : "队员登录"}
           </Link>
         </div>
 
@@ -126,6 +148,14 @@ export default function Navbar() {
                 className="px-5 py-2 bg-rm-red hover:bg-red-700 text-white text-sm font-medium rounded transition-colors text-center"
               >
                 加入我们
+              </Link>
+              <Link
+                href={loggedIn ? "/portal" : "/login"}
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2 border border-white/15 hover:border-rm-red/50 text-white text-sm font-medium rounded transition-colors text-center"
+              >
+                {loggedIn ? <UserRound className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+                {loggedIn ? "队员空间" : "队员登录"}
               </Link>
             </div>
           </motion.div>

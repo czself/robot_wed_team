@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Eye, Lock, RefreshCw, Search } from "lucide-react";
+import { Download, Eye, Lock, RefreshCw, Search, Trash2 } from "lucide-react";
 
 interface RecruitEntry {
   id: string;
@@ -36,11 +36,16 @@ function csvCell(value: unknown): string {
   return `"${String(value ?? "").replace(/"/g, '""')}"`;
 }
 
-export default function RecruitAdmin() {
+export default function RecruitAdmin({
+  requireManualKey = true,
+}: {
+  requireManualKey?: boolean;
+}) {
   const [adminKey, setAdminKey] = useState("");
   const [entries, setEntries] = useState<RecruitEntry[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -66,7 +71,7 @@ export default function RecruitAdmin() {
   }, [entries]);
 
   const loadEntries = async () => {
-    if (!adminKey.trim()) {
+    if (requireManualKey && !adminKey.trim()) {
       setError("请输入管理密码");
       return;
     }
@@ -74,8 +79,11 @@ export default function RecruitAdmin() {
     setLoading(true);
     setError(null);
     try {
+      const headers: HeadersInit = {};
+      if (adminKey.trim()) headers.Authorization = `Bearer ${adminKey.trim()}`;
+
       const res = await fetch("/api/recruit", {
-        headers: { Authorization: `Bearer ${adminKey.trim()}` },
+        headers,
         cache: "no-store",
       });
       const json = await res.json().catch(() => null);
@@ -117,6 +125,33 @@ export default function RecruitAdmin() {
     URL.revokeObjectURL(url);
   };
 
+  const deleteEntry = async (entry: RecruitEntry) => {
+    if (deletingId) return;
+    const ok = window.confirm(`确认删除 ${entry.name} 的报名记录？`);
+    if (!ok) return;
+
+    setDeletingId(entry.id);
+    setError(null);
+    try {
+      const headers: HeadersInit = {};
+      if (adminKey.trim()) headers.Authorization = `Bearer ${adminKey.trim()}`;
+
+      const res = await fetch(`/api/recruit?id=${encodeURIComponent(entry.id)}`, {
+        method: "DELETE",
+        headers,
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || "删除失败");
+      }
+      setEntries((prev) => prev.filter((item) => item.id !== entry.id));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <section className="mx-auto w-full max-w-7xl px-4 md:px-6">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -150,22 +185,28 @@ export default function RecruitAdmin() {
 
       <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.03] p-4">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)_auto_auto]">
-          <label className="relative block">
-            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
-            <input
-              type="password"
-              value={adminKey}
-              onChange={(e) => {
-                setAdminKey(e.target.value);
-                setError(null);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") loadEntries();
-              }}
-              placeholder="ADMIN_KEY"
-              className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/80 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-red/50"
-            />
-          </label>
+          {requireManualKey ? (
+            <label className="relative block">
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
+              <input
+                type="password"
+                value={adminKey}
+                onChange={(e) => {
+                  setAdminKey(e.target.value);
+                  setError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") loadEntries();
+                }}
+                placeholder="ADMIN_KEY"
+                className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/80 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-red/50"
+              />
+            </label>
+          ) : (
+            <div className="flex h-11 items-center rounded-lg border border-white/10 bg-rm-dark/80 px-3 text-sm text-rm-gray">
+              已使用管理员登录态
+            </div>
+          )}
 
           <label className="relative block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
@@ -238,6 +279,7 @@ export default function RecruitAdmin() {
                 <th className="px-4 py-3">邮箱</th>
                 <th className="px-4 py-3">组别</th>
                 <th className="px-4 py-3">备注</th>
+                <th className="px-4 py-3 text-right">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -261,6 +303,21 @@ export default function RecruitAdmin() {
                   </td>
                   <td className="max-w-xs px-4 py-3 text-rm-gray">
                     {entry.note || "-"}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => deleteEntry(entry)}
+                      disabled={deletingId === entry.id}
+                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-rm-red/30 bg-rm-red/10 px-3 text-xs font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingId === entry.id ? (
+                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                      删除
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -291,6 +348,19 @@ export default function RecruitAdmin() {
                 <div>邮箱：{entry.email}</div>
                 <div>备注：{entry.note || "-"}</div>
               </div>
+              <button
+                type="button"
+                onClick={() => deleteEntry(entry)}
+                disabled={deletingId === entry.id}
+                className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-rm-red/30 bg-rm-red/10 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingId === entry.id ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                删除记录
+              </button>
             </article>
           ))}
         </div>
@@ -303,7 +373,7 @@ export default function RecruitAdmin() {
 
         {!loaded && (
           <div className="px-4 py-16 text-center text-sm text-rm-gray">
-            输入 ADMIN_KEY 后查看报名名单
+            {requireManualKey ? "输入 ADMIN_KEY 后查看报名名单" : "点击查看后读取报名名单"}
           </div>
         )}
       </div>

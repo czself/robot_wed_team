@@ -64,6 +64,14 @@ export async function listEntries(): Promise<RecruitEntry[]> {
   return entries;
 }
 
+export async function deleteEntry(id: string): Promise<{ deleted: boolean }> {
+  const entryKey = `${META_PREFIX}${id}`;
+  const existed = await kv.get(entryKey);
+  await kv.lrem(ENTRIES_KEY, 0, id);
+  await kv.del(entryKey);
+  return { deleted: Boolean(existed) };
+}
+
 const GROUP_LABELS: Record<string, string> = {
   mechanical: "机械组",
   embedded: "嵌入式组",

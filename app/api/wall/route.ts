@@ -8,6 +8,8 @@ import {
   type SortKey,
 } from "@/lib/wall";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getCurrentUser } from "@/lib/session";
+import { isLegacyAdminRequest } from "@/lib/legacy-admin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -110,10 +112,8 @@ export async function DELETE(req: NextRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
 
-    const adminKey = process.env.ADMIN_KEY;
-    const auth = req.headers.get("authorization") || "";
-    const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-    if (!adminKey || token !== adminKey) {
+    const user = await getCurrentUser();
+    if (user?.role !== "admin" && !isLegacyAdminRequest(req)) {
       return NextResponse.json(
         { ok: false, error: "未授权" },
         { status: 401 }

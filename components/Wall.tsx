@@ -245,9 +245,10 @@ export default function Wall() {
 
   const handleLike = async (id: string) => {
     const wasLiked = likedIds.has(id);
+    if (wasLiked) return;
+
     const next = new Set(likedIds);
-    if (wasLiked) next.delete(id);
-    else next.add(id);
+    next.add(id);
     setLikedIds(next);
     try {
       localStorage.setItem("wall:liked", JSON.stringify([...next]));
@@ -258,7 +259,7 @@ export default function Wall() {
         if (m.id === id)
           return {
             ...m,
-            likes: Math.max(0, m.likes + (wasLiked ? -1 : 1)),
+            likes: m.likes + 1,
           };
         if (m.replies) {
           return {
@@ -267,7 +268,7 @@ export default function Wall() {
               r.id === id
                 ? {
                     ...r,
-                    likes: Math.max(0, r.likes + (wasLiked ? -1 : 1)),
+                    likes: r.likes + 1,
                   }
                 : r
             ),

@@ -4,8 +4,11 @@ import {
   createEntry,
   sendMailNotice,
   listEntries,
+  deleteEntry,
 } from "@/lib/recruit";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getCurrentUser } from "@/lib/session";
+import { isLegacyAdminRequest } from "@/lib/legacy-admin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,16 +19,15 @@ function clientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip") || "anon";
 }
 
-function isAdmin(req: NextRequest): boolean {
-  const adminKey = process.env.ADMIN_KEY;
-  const auth = req.headers.get("authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  return Boolean(adminKey && token === adminKey);
+async function isAdmin(req: NextRequest): Promise<boolean> {
+  const user = await getCurrentUser();
+  if (user?.role === "admin") return true;
+  return isLegacyAdminRequest(req);
 }
 
 export async function GET(req: NextRequest) {
   try {
-    if (!isAdmin(req)) {
+    if (!(await isAdmin(req))) {
       return NextResponse.json(
         { ok: false, error: "未授权" },
         { status: 401 }
@@ -69,6 +71,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, data: { id: entry.id } });
   } catch (err) {
     console.error("recruit submit failed:", err);
+    return NextResponse.json(
+      { ok: false, error: "服务器暂时不可用，请稍后再试" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json(
+        { ok: false, error: "未授权" },
+        { status: 401 }
+      );
+    }
+
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    if (!id) {
+      return NextResponse.json(
+        { ok: false, error: "缺少 id" },
+        { status: 400 }
+      );
+    }
+
+    const result = await deleteEntry(id);
+    return NextResponse.json({ ok: true, ...result });
+  } catch (err) {
+    console.error("recruit delete failed:", err);
     return NextResponse.json(
       { ok: false, error: "服务器暂时不可用，请稍后再试" },
       { status: 500 }

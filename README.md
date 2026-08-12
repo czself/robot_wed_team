@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YZ Control 官网
 
-## Getting Started
+这是 YZ Control RoboMaster 战队官网。项目分为公开官网和队员门户两部分：
 
-First, run the development server:
+- 公开官网：战队介绍、技术星图、机器人展示、招新报名、留言墙。
+- 队员门户：登录后查看队内资料、项目索引、管理员后台和报名记录。
+
+## 技术栈
+
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS 4
+- Vercel KV
+- Nodemailer
+- Framer Motion / GSAP / Lenis
+
+## 本地开发
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 http://localhost:3000。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 环境变量
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+基础门户账号会在第一次登录请求时自动初始化。管理员密码至少 6 位：
 
-## Learn More
+```bash
+TEAM_ADMIN_EMAIL=admin@yz-control.local
+TEAM_ADMIN_PASSWORD=change-this-password
+```
 
-To learn more about Next.js, take a look at the following resources:
+兼容旧后台和留言删除接口。默认不启用 Bearer `ADMIN_KEY` 管理权限；确实需要过渡时显式打开：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+ADMIN_KEY=legacy-admin-key
+ALLOW_LEGACY_ADMIN_KEY=true
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+报名邮件通知：
 
-## Deploy on Vercel
+```bash
+SMTP_HOST=
+SMTP_PORT=465
+SMTP_USER=
+SMTP_PASS=
+SMTP_TO=
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Vercel KV 变量由 Vercel 绑定提供，或在本地按 `@vercel/kv` 要求配置。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 重要约束
+
+- 队内资料不要放在 `public/`，否则知道路径的人都能访问。
+- `/portal/*` 需要队员登录。
+- `/portal/admin/*` 需要管理员账号。
+- 管理员创建队员账号，不开放游客自助注册。
+
+## 验证
+
+```bash
+npm run lint
+npm run build
+```
