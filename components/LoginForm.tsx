@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge, Lock, LogIn } from "lucide-react";
+import { safeInternalPath } from "@/lib/security";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -12,7 +13,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submit = async () => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (loading) return;
     setError(null);
     setLoading(true);
@@ -24,7 +26,11 @@ export default function LoginForm() {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.ok) throw new Error(json?.error || "登录失败");
-      router.replace(searchParams.get("next") || "/portal");
+      router.replace(
+        json.data?.mustChangePassword
+          ? "/portal?password=required"
+          : safeInternalPath(searchParams.get("next"))
+      );
       router.refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -38,19 +44,24 @@ export default function LoginForm() {
       <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-rm-red/10 blur-3xl" />
       <div className="absolute -bottom-16 -left-16 h-44 w-44 rounded-full bg-rm-blue/10 blur-3xl" />
 
-      <div className="relative">
+      <form className="relative" onSubmit={submit}>
         <p className="mb-3 text-xs uppercase tracking-[0.28em] text-rm-blue">
           Member Access
         </p>
-        <h1 className="text-3xl font-black text-white">队员登录</h1>
+        <h2 className="text-3xl font-black text-white">队员登录</h2>
         <p className="mt-3 text-sm leading-7 text-rm-gray">
           游客可以继续浏览公开官网。队员从这里登录后可查看队内资料和后台记录。
         </p>
 
         <div className="mt-7 space-y-4">
           <label className="relative block">
+            <span className="sr-only">学号或用户名</span>
             <Badge className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
             <input
+              id="login-username"
+              name="username"
+              autoComplete="username"
+              required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               inputMode="numeric"
@@ -60,13 +71,15 @@ export default function LoginForm() {
           </label>
 
           <label className="relative block">
+            <span className="sr-only">密码</span>
             <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rm-gray" />
             <input
+              id="login-password"
+              name="password"
+              autoComplete="current-password"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void submit();
-              }}
               type="password"
               placeholder="密码"
               className="h-11 w-full rounded-lg border border-white/10 bg-rm-dark/70 pl-10 pr-3 text-sm text-white outline-none transition-colors placeholder:text-rm-gray/50 focus:border-rm-red/50"
@@ -75,21 +88,23 @@ export default function LoginForm() {
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg border border-rm-red/30 bg-rm-red/10 px-4 py-2 text-sm text-rm-red">
+          <div
+            role="alert"
+            className="mt-4 rounded-lg border border-rm-red/30 bg-rm-red/10 px-4 py-2 text-sm text-rm-red"
+          >
             {error}
           </div>
         )}
 
         <button
-          type="button"
-          onClick={submit}
+          type="submit"
           disabled={!username.trim() || !password || loading}
           className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-rm-red px-5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <LogIn className="h-4 w-4" />
           {loading ? "登录中..." : "进入队员空间"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

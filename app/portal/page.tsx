@@ -35,6 +35,26 @@ const primaryModules = [
 
 export default async function PortalPage() {
   const user = await requireUser();
+
+  if (user.mustChangePassword) {
+    return (
+      <div className="space-y-6">
+        <section className="rounded-lg border border-rm-red/30 bg-rm-red/10 p-5 md:p-7">
+          <p className="mb-3 text-xs uppercase tracking-[0.28em] text-rm-red">
+            Security Required
+          </p>
+          <h2 className="text-3xl font-black text-white md:text-5xl">
+            请先设置你自己的密码
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-rm-gray">
+            当前使用的是管理员分配的初始密码。修改完成后，所有旧会话都会失效，再重新登录即可进入资料库。
+          </p>
+        </section>
+        <PasswordChangeForm />
+      </div>
+    );
+  }
+
   const resources = await listResources();
 
   return (
@@ -52,13 +72,15 @@ export default async function PortalPage() {
               这里放队员每天真正会用的入口：资料、报名记录、留言管理。账号和资料维护放在后台管理里，不再混在总览里。
             </p>
           </div>
-          <Link
-            href="/portal/admin"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-rm-red/40 bg-rm-red/10 px-5 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            进入后台管理
-          </Link>
+          {user.role === "admin" && (
+            <Link
+              href="/portal/admin"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-rm-red/40 bg-rm-red/10 px-5 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              进入后台管理
+            </Link>
+          )}
         </div>
       </section>
 

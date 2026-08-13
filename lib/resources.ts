@@ -1,6 +1,6 @@
 import "server-only";
 
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/kv";
 import { defaultResources, type TeamResource } from "@/data/portal";
 
 const RESOURCES_KEY = "team:resources";

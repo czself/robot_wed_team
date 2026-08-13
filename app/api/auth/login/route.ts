@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateUser, ensureBootstrapAdmin, publicUser } from "@/lib/auth";
 import { createSession, setSessionCookie } from "@/lib/session";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
+import { apiServerError } from "@/lib/api-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,6 +16,9 @@ function clientIp(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const ip = clientIp(req);
     const rl = await checkRateLimit(`login:${ip}`);
     if (!rl.allowed) {
@@ -52,10 +57,6 @@ export async function POST(req: NextRequest) {
     await setSessionCookie(token);
     return NextResponse.json({ ok: true, data: publicUser(user) });
   } catch (err) {
-    console.error("login failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "login failed");
   }
 }

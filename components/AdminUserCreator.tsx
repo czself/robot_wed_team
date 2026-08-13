@@ -11,21 +11,25 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import type { PublicTeamUser, UserStatus } from "@/lib/auth";
+import type { PublicTeamUser, UserRole, UserStatus } from "@/lib/auth";
+import { MIN_PASSWORD_LENGTH, validatePassword } from "@/lib/security";
 
 const groups = ["机械组", "嵌入式组", "视觉组", "算法组", "运营组", "综合"];
 
 export default function AdminUserCreator({
   initialUsers,
+  currentUserId,
 }: {
   initialUsers: PublicTeamUser[];
+  currentUserId: string;
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [form, setForm] = useState({
     username: "",
     name: "",
-    password: "123456",
+    password: "",
     group: "嵌入式组",
+    role: "member" as UserRole,
   });
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -41,7 +45,7 @@ export default function AdminUserCreator({
     const q = query.trim().toLowerCase();
     const matchesQuery =
       !q ||
-      [user.username, user.name, user.group, user.status]
+      [user.username, user.name, user.group, user.role, user.status]
         .join(" ")
         .toLowerCase()
         .includes(q);
@@ -50,14 +54,17 @@ export default function AdminUserCreator({
     return matchesQuery && matchesStatus && matchesGroup;
   });
 
-  const update = (key: keyof typeof form, value: string) => {
+  const update = <K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K]
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setError(null);
   };
 
   const patchUser = async (
     id: string,
-    patch: Partial<Pick<PublicTeamUser, "name" | "group" | "status">> & {
+    patch: Partial<Pick<PublicTeamUser, "name" | "group" | "status" | "role">> & {
       password?: string;
     }
   ) => {
@@ -122,8 +129,9 @@ export default function AdminUserCreator({
       setForm({
         username: "",
         name: "",
-        password: "123456",
+        password: "",
         group: "嵌入式组",
+        role: "member",
       });
     } catch (e) {
       setError((e as Error).message);
@@ -171,7 +179,9 @@ export default function AdminUserCreator({
           </div>
           <div>
             <h3 className="font-black text-white">创建队员账号</h3>
-            <p className="text-xs text-rm-gray">使用学号作为用户名，默认密码 123456</p>
+            <p className="text-xs text-rm-gray">
+              设置临时强密码，队员首次登录后必须修改
+            </p>
           </div>
         </div>
 
@@ -193,7 +203,7 @@ export default function AdminUserCreator({
             value={form.password}
             onChange={(e) => update("password", e.target.value)}
             type="password"
-            placeholder="初始密码，默认 123456"
+            placeholder={`初始密码，至少 ${MIN_PASSWORD_LENGTH} 位且含字母和数字`}
             className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-red/50"
           />
           <div>
@@ -207,6 +217,14 @@ export default function AdminUserCreator({
               ))}
             </select>
           </div>
+          <select
+            value={form.role}
+            onChange={(e) => update("role", e.target.value as UserRole)}
+            className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none focus:border-rm-blue/50"
+          >
+            <option value="member">普通队员</option>
+            <option value="admin">管理员</option>
+          </select>
         </div>
 
         {error && (
@@ -218,7 +236,12 @@ export default function AdminUserCreator({
         <button
           type="button"
           onClick={submit}
-          disabled={loading}
+          disabled={
+            loading ||
+            !form.username.trim() ||
+            !form.name.trim() ||
+            Boolean(validatePassword(form.password))
+          }
           className="mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-rm-red px-4 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-40"
         >
           {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -243,7 +266,7 @@ export default function AdminUserCreator({
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="搜索学号、姓名、组别"
+                  placeholder="搜索学号、姓名、组别、权限"
                   className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 pl-10 pr-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-blue/50"
                 />
               </label>
@@ -268,9 +291,10 @@ export default function AdminUserCreator({
               </select>
             </div>
           </div>
-          <div className="hidden grid-cols-[1.1fr_120px_100px_220px_260px] gap-3 px-3 pt-2 text-xs font-bold uppercase tracking-[0.14em] text-rm-gray xl:grid">
+          <div className="hidden grid-cols-[1.1fr_100px_90px_100px_160px_180px] gap-3 px-3 pt-2 text-xs font-bold uppercase tracking-[0.14em] text-rm-gray xl:grid">
             <div>账号 / 姓名</div>
             <div>组别</div>
+            <div>权限</div>
             <div>状态</div>
             <div>重置密码</div>
             <div>操作</div>
@@ -280,7 +304,7 @@ export default function AdminUserCreator({
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className="grid gap-3 px-4 py-4 text-sm text-rm-gray xl:grid-cols-[1.1fr_120px_100px_220px_260px]"
+              className="grid gap-3 px-4 py-4 text-sm text-rm-gray xl:grid-cols-[1.1fr_100px_90px_100px_160px_180px]"
             >
               <div>
                 <input
@@ -298,6 +322,9 @@ export default function AdminUserCreator({
                 <div className="font-mono text-xs">
                   {user.username}
                 </div>
+                {user.mustChangePassword && (
+                  <div className="mt-1 text-[11px] text-rm-red">等待修改初始密码</div>
+                )}
               </div>
               <select
                 value={user.group}
@@ -315,11 +342,23 @@ export default function AdminUserCreator({
                 ))}
               </select>
               <select
+                value={user.role}
+                onChange={(e) =>
+                  void patchUser(user.id, { role: e.target.value as UserRole })
+                }
+                disabled={updatingId === user.id || user.id === currentUserId}
+                className="h-9 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-xs text-white outline-none focus:border-rm-blue/50 disabled:opacity-50"
+                aria-label={`${user.name}的账号权限`}
+              >
+                <option value="member">队员</option>
+                <option value="admin">管理员</option>
+              </select>
+              <select
                 value={user.status}
                 onChange={(e) =>
                   void patchUser(user.id, { status: e.target.value as UserStatus })
                 }
-                disabled={updatingId === user.id}
+                disabled={updatingId === user.id || user.id === currentUserId}
                 className="h-9 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-sm text-white outline-none focus:border-rm-red/50 disabled:opacity-50"
               >
                 <option value="active">启用</option>
@@ -335,7 +374,7 @@ export default function AdminUserCreator({
                     }))
                   }
                   type="password"
-                  placeholder="新密码"
+                  placeholder={`至少 ${MIN_PASSWORD_LENGTH} 位`}
                   className="h-9 min-w-0 flex-1 rounded-lg border border-white/10 bg-rm-dark/70 px-2 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-blue/50"
                 />
                 <button
@@ -345,7 +384,10 @@ export default function AdminUserCreator({
                       password: passwordDrafts[user.id] || "",
                     })
                   }
-                  disabled={updatingId === user.id || !(passwordDrafts[user.id] || "").trim()}
+                  disabled={
+                    updatingId === user.id ||
+                    Boolean(validatePassword(passwordDrafts[user.id] || ""))
+                  }
                   className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rm-blue/30 bg-rm-blue/10 text-rm-blue transition-colors hover:bg-rm-blue/15 disabled:opacity-40"
                   aria-label="重置密码"
                   title="重置密码"
@@ -375,7 +417,7 @@ export default function AdminUserCreator({
                 <button
                   type="button"
                   onClick={() => void removeUser(user)}
-                  disabled={updatingId === user.id}
+                  disabled={updatingId === user.id || user.id === currentUserId}
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-rm-red/40 bg-rm-red/10 px-3 text-sm font-bold text-rm-red transition-colors hover:bg-rm-red/15 disabled:opacity-40"
                 >
                   <Trash2 className="h-4 w-4" />

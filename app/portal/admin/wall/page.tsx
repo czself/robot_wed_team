@@ -1,15 +1,15 @@
 import AdminWallManager from "@/components/AdminWallManager";
 import { listMessages } from "@/lib/wall";
-import { requireUser } from "@/lib/session";
+import { requireAdmin } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "留言管理 · YZ Control",
+  title: "留言管理",
 };
 
 export default async function PortalWallAdminPage() {
-  await requireUser();
+  await requireAdmin();
   const result = await listMessages({
     sort: "new",
     offset: 0,

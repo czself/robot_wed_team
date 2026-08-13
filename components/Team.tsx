@@ -24,28 +24,25 @@ export default function Team() {
             <span className="text-rm-red">Our</span>{" "}
             <span className="text-rm-blue">Team</span>
           </p>
-          <h2 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
             六大技术方向
-          </h2>
+          </h1>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {teamGroups.map((group, index) => (
-            <motion.div
+            <motion.article
               key={group.id}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.1 + index * 0.1, duration: 0.6 }}
-              className={`p-6 rounded-xl border bg-white/[0.02] cursor-pointer transition-all duration-300 hud-corner ${
+              className={`p-6 rounded-xl border bg-white/[0.02] transition-all duration-300 hud-corner ${
                 expandedId === group.id
                   ? index % 2 === 0
                     ? "border-rm-red/50 shadow-[0_0_30px_rgba(217,4,41,0.15)]"
                     : "border-rm-blue/50 shadow-[0_0_30px_rgba(0,200,255,0.15)]"
                   : "border-white/5 hover:border-rm-red/30 hover:shadow-[0_0_20px_rgba(217,4,41,0.1)]"
               }`}
-              onClick={() =>
-                setExpandedId(expandedId === group.id ? null : group.id)
-              }
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-3xl">{group.icon}</div>
@@ -61,9 +58,10 @@ export default function Team() {
                 {group.description}
               </p>
 
-              <AnimatePresence>
-                {expandedId === group.id && (
-                  <motion.div
+              <div id={`team-skills-${group.id}`}>
+                <AnimatePresence>
+                  {expandedId === group.id && (
+                    <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
@@ -83,12 +81,21 @@ export default function Team() {
                         </span>
                       ))}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               <div className="mt-3 flex items-center justify-between text-xs">
-                <span className="text-rm-gray flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-expanded={expandedId === group.id}
+                  aria-controls={`team-skills-${group.id}`}
+                  onClick={() =>
+                    setExpandedId(expandedId === group.id ? null : group.id)
+                  }
+                  className="text-rm-gray hover:text-white flex items-center gap-1 transition-colors"
+                >
                   <motion.span
                     animate={{ rotate: expandedId === group.id ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
@@ -96,16 +103,15 @@ export default function Team() {
                     ▼
                   </motion.span>
                   {expandedId === group.id ? "收起" : "展开技能树"}
-                </span>
+                </button>
                 <a
                   href="/recruit"
-                  onClick={(e) => e.stopPropagation()}
                   className="text-rm-red/80 hover:text-rm-red transition-colors"
                 >
                   加入 →
                 </a>
               </div>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       </div>

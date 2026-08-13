@@ -1,14 +1,14 @@
 import RecruitAdmin from "@/components/RecruitAdmin";
-import { requireUser } from "@/lib/session";
+import { requireAdmin } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "报名管理 · YZ Control",
+  title: "报名管理",
 };
 
 export default async function PortalRecruitAdminPage() {
-  await requireUser();
+  await requireAdmin();
 
   return <RecruitAdmin canDelete />;
 }

@@ -49,7 +49,7 @@
   --color-rm-red: #D90429;
   --color-rm-blue: #00C8FF;
   --color-rm-dark: #0A0A0A;
-  --color-rm-gray: #666666;
+  --color-rm-gray: #9A9A9A;
 }
 
 :root {
@@ -64,7 +64,7 @@
   --secondary: #1A1A1A;
   --secondary-foreground: #FFFFFF;
   --muted: #1A1A1A;
-  --muted-foreground: #666666;
+  --muted-foreground: #9A9A9A;
   --accent: #1A1A1A;
   --accent-foreground: #FFFFFF;
   --destructive: #D90429;
@@ -428,6 +428,30 @@ body {
 
 .marquee-paused {
   animation-play-state: paused !important;
+}
+
+.marquee-row:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* ===== HUD Sweep ===== */

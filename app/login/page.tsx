@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import LoginForm from "@/components/LoginForm";
 
 export const metadata = {
-  title: "队员登录 · YZ Control",
+  title: "队员登录",
   description: "YZ Control 战队官网队员空间登录。",
+  robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { KeyRound, RefreshCw } from "lucide-react";
+import { MIN_PASSWORD_LENGTH, validatePassword } from "@/lib/security";
 
 export default function PasswordChangeForm() {
   const router = useRouter();
@@ -15,13 +16,18 @@ export default function PasswordChangeForm() {
 
   const submit = async () => {
     if (loading) return;
-    setLoading(true);
     setMessage(null);
     setError(null);
     if (nextPassword !== confirmPassword) {
       setError("两次输入的新密码不一致");
       return;
     }
+    const passwordError = validatePassword(nextPassword);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    setLoading(true);
 
     try {
       const res = await fetch("/api/portal/password", {
@@ -59,49 +65,62 @@ export default function PasswordChangeForm() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+      <form
+        className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void submit();
+        }}
+      >
         <input
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
           type="password"
           placeholder="当前密码"
+          aria-label="当前密码"
+          autoComplete="current-password"
           className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-blue/50"
         />
         <input
           value={nextPassword}
           onChange={(e) => setNextPassword(e.target.value)}
           type="password"
-          placeholder="新密码，至少 6 位"
+          placeholder={`新密码，至少 ${MIN_PASSWORD_LENGTH} 位且含字母和数字`}
+          aria-label="新密码"
+          autoComplete="new-password"
           className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-red/50"
         />
         <input
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") void submit();
-          }}
           type="password"
           placeholder="确认新密码"
+          aria-label="确认新密码"
+          autoComplete="new-password"
           className="h-10 rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none placeholder:text-rm-gray/50 focus:border-rm-red/50"
         />
         <button
-          type="button"
-          onClick={submit}
-          disabled={loading || !currentPassword || nextPassword.length < 6 || !confirmPassword}
+          type="submit"
+          disabled={
+            loading ||
+            !currentPassword ||
+            Boolean(validatePassword(nextPassword)) ||
+            !confirmPassword
+          }
           className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-rm-blue px-4 text-sm font-bold text-white transition-colors hover:bg-cyan-600 disabled:opacity-40"
         >
           {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
           保存
         </button>
-      </div>
+      </form>
 
       {message && (
-        <div className="mt-3 rounded-lg border border-rm-blue/30 bg-rm-blue/10 px-3 py-2 text-sm text-rm-blue">
+        <div aria-live="polite" className="mt-3 rounded-lg border border-rm-blue/30 bg-rm-blue/10 px-3 py-2 text-sm text-rm-blue">
           {message}
         </div>
       )}
       {error && (
-        <div className="mt-3 rounded-lg border border-rm-red/30 bg-rm-red/10 px-3 py-2 text-sm text-rm-red">
+        <div role="alert" className="mt-3 rounded-lg border border-rm-red/30 bg-rm-red/10 px-3 py-2 text-sm text-rm-red">
           {error}
         </div>
       )}

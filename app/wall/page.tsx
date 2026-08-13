@@ -1,7 +1,7 @@
 import Wall from "@/components/Wall";
 
 export const metadata = {
-  title: "留言墙 · YZ Control | RoboMaster 2026",
+  title: "留言墙",
   description:
     "YZ Control 留言墙 — 给战队留言、点赞、回复，与我们一起书写传奇。",
 };

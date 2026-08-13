@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/session-cookie";
+import { safeInternalPath } from "@/lib/security";
 
 const protectedPrefixes = ["/portal"];
 export function proxy(req: NextRequest) {
@@ -9,7 +10,10 @@ export function proxy(req: NextRequest) {
 
   if (isProtected && !hasSession) {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("next", path);
+    loginUrl.searchParams.set(
+      "next",
+      safeInternalPath(`${path}${req.nextUrl.search}`, "/portal")
+    );
     return NextResponse.redirect(loginUrl);
   }
 

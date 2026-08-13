@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/kv";
 
 const store = new Map<string, { count: number; resetAt: number }>();
 

@@ -92,9 +92,12 @@ export default function Navbar() {
         </div>
 
         <button
+          type="button"
           className="md:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? "关闭导航菜单" : "打开导航菜单"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
         >
           <span
             className={`w-6 h-0.5 bg-white transition-all duration-300 ${
@@ -117,6 +120,7 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            id="mobile-navigation"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}

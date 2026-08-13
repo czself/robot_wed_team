@@ -12,7 +12,8 @@
 - Tailwind CSS 4
 - Vercel KV
 - Nodemailer
-- Framer Motion / GSAP / Lenis
+- Framer Motion
+- Vitest
 
 ## 本地开发
 
@@ -21,22 +22,22 @@ npm install
 npm run dev
 ```
 
-打开 http://localhost:3000。
+打开 http://localhost:3000。本地开发在未配置远程 KV 时会使用进程内存储；重启开发服务器后，这些临时数据会清空。
 
 ## 环境变量
 
-基础队员账号会在第一次登录请求时自动初始化。密码至少 6 位：
+生产环境必须配置持久化 KV：
 
 ```bash
-TEAM_MEMBER_USERNAME=2025754227
-TEAM_MEMBER_PASSWORD=change-this-password
+KV_REST_API_URL=
+KV_REST_API_TOKEN=
 ```
 
-旧版 Bearer `ADMIN_KEY` 只建议作为过渡或应急通道。默认不启用；确实需要时显式打开：
+只有同时显式配置以下变量时，系统才会在首次登录请求中初始化管理员。用户名必须是 6–20 位数字学号，密码必须为 10–72 位并同时包含字母和数字；首次登录后必须修改密码：
 
 ```bash
-ADMIN_KEY=legacy-admin-key
-ALLOW_LEGACY_ADMIN_KEY=true
+TEAM_ADMIN_USERNAME=20260001
+TEAM_ADMIN_PASSWORD=replace-with-a-strong-bootstrap-password
 ```
 
 报名邮件通知：
@@ -49,19 +50,24 @@ SMTP_PASS=
 SMTP_TO=
 ```
 
-Vercel KV 变量由 Vercel 绑定提供，或在本地按 `@vercel/kv` 要求配置。
+完整模板见 [`.env.example`](./.env.example)。部署后可通过 `/api/health` 检查 KV 与邮件通知配置状态；生产环境缺少 KV 时，依赖数据的接口会明确返回 `503`，不会悄悄写入易失内存。
 
 ## 重要约束
 
 - 队内资料不要放在 `public/`，否则知道路径的人都能访问。
 - `/portal/*` 需要队员登录。
-- `/portal/admin/*` 使用队员账号登录；队员可查看和维护报名记录、留言记录、账号和资料。
-- 只有游客和队员两种访问状态，不再区分其他身份。
-- 队员创建队员账号，不开放游客自助注册。
+- 普通队员可查看队内资料，但不能访问账号、资料、报名和留言管理接口。
+- `/portal/admin/*` 及对应管理接口只允许管理员访问。
+- 管理员创建的新账号必须在首次登录后修改初始密码；重置密码、停用账号或变更权限会撤销该账号的现有会话。
+- 不开放游客自助注册，也不提供固定默认账号或默认密码。
 
 ## 验证
 
 ```bash
 npm run lint
+npm run typecheck
+npm test
 npm run build
 ```
+
+同样的四项检查会在 GitHub Actions 中自动运行。

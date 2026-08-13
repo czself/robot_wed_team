@@ -1,10 +1,12 @@
 import "server-only";
 
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/kv";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import { validatePassword } from "@/lib/security";
+import { revokeUserSessions } from "@/lib/session-store";
 
-export type UserRole = "member";
+export type UserRole = "admin" | "member";
 export type UserStatus = "active" | "disabled";
 
 export interface TeamUser {
@@ -16,6 +18,7 @@ export interface TeamUser {
   group: string;
   passwordHash: string;
   status: UserStatus;
+  mustChangePassword?: boolean;
   createdAt: number;
   lastLoginAt?: number;
 }
@@ -28,6 +31,7 @@ export interface PublicTeamUser {
   role: UserRole;
   group: string;
   status: UserStatus;
+  mustChangePassword: boolean;
   createdAt: number;
   lastLoginAt?: number;
 }
@@ -37,7 +41,6 @@ const scryptAsync = promisify(scrypt);
 const USERS_KEY = "team:users";
 const USER_PREFIX = "team:user:";
 const GROUPS = ["机械组", "嵌入式组", "视觉组", "算法组", "运营组", "综合"];
-const DEFAULT_MEMBER_PASSWORD = "123456";
 
 function normalizeUsername(username: string): string {
   return username.trim().toLowerCase();
@@ -51,11 +54,24 @@ function userKey(id: string): string {
   return `${USER_PREFIX}${id}`;
 }
 
+function normalizeStoredUser(user: TeamUser): TeamUser {
+  return {
+    ...user,
+    role: user.role === "admin" ? "admin" : "member",
+    mustChangePassword: Boolean(user.mustChangePassword),
+  };
+}
+
 function toPublicUser(user: TeamUser): PublicTeamUser {
-  const { passwordHash, ...safeUser } = user;
+  const normalized = normalizeStoredUser(user);
+  const { passwordHash, ...safeUser } = normalized;
   void passwordHash;
   const username = safeUser.username || safeUser.id;
-  return { ...safeUser, username };
+  return {
+    ...safeUser,
+    username,
+    mustChangePassword: Boolean(safeUser.mustChangePassword),
+  };
 }
 
 export function validateUserInput(input: unknown):
@@ -64,21 +80,25 @@ export function validateUserInput(input: unknown):
       name: string;
       password: string;
       group: string;
+      role: UserRole;
     }
   | string {
   if (!input || typeof input !== "object") return "请求体无效";
   const b = input as Record<string, unknown>;
   const username = normalizeUsername(String(b.username ?? b.email ?? ""));
   const name = String(b.name ?? "").trim();
-  const password = String(b.password ?? "123456");
+  const password = String(b.password ?? "");
   const group = String(b.group ?? "综合").trim() || "综合";
+  const role = b.role === undefined || b.role === "member" ? "member" : b.role === "admin" ? "admin" : null;
 
   if (!isValidUsername(username)) return "用户名必须是 6-20 位数字学号";
   if (!name || name.length > 24) return "姓名必填（最多 24 字）";
-  if (password.length < 6 || password.length > 72) return "密码长度应为 6-72 位";
+  const passwordError = validatePassword(password);
+  if (passwordError) return passwordError;
   if (!GROUPS.includes(group)) return "组别无效";
+  if (!role) return "账号权限无效";
 
-  return { username, name, password, group };
+  return { username, name, password, group, role };
 }
 
 export function validateUserUpdateInput(input: unknown):
@@ -88,6 +108,7 @@ export function validateUserUpdateInput(input: unknown):
       group?: string;
       status?: UserStatus;
       password?: string;
+      role?: UserRole;
     }
   | string {
   if (!input || typeof input !== "object") return "请求体无效";
@@ -98,23 +119,28 @@ export function validateUserUpdateInput(input: unknown):
   const status =
     b.status === "active" || b.status === "disabled" ? b.status : undefined;
   const password = typeof b.password === "string" ? b.password : undefined;
+  const role =
+    b.role === "admin" || b.role === "member" ? b.role : undefined;
 
-  if (!id) return "缺少账号 ID";
+  if (!isValidUsername(id)) return "账号 ID 无效";
   if (name !== undefined && (!name || name.length > 24)) return "姓名必填（最多 24 字）";
   if (group !== undefined && !GROUPS.includes(group)) return "组别无效";
-  if (password !== undefined && (password.length < 6 || password.length > 72)) {
-    return "密码长度应为 6-72 位";
+  if (b.role !== undefined && role === undefined) return "账号权限无效";
+  if (password !== undefined) {
+    const passwordError = validatePassword(password);
+    if (passwordError) return passwordError;
   }
   if (
     name === undefined &&
     group === undefined &&
     status === undefined &&
-    password === undefined
+    password === undefined &&
+    role === undefined
   ) {
     return "没有可更新内容";
   }
 
-  return { id, name, group, status, password };
+  return { id, name, group, status, password, role };
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -135,7 +161,7 @@ export async function verifyPassword(password: string, passwordHash: string): Pr
 
 export async function getUserById(id: string): Promise<TeamUser | null> {
   const user = (await kv.get(userKey(normalizeUsername(id)))) as TeamUser | null;
-  return user?.id ? user : null;
+  return user?.id ? normalizeStoredUser(user) : null;
 }
 
 export async function getUserByUsername(username: string): Promise<TeamUser | null> {
@@ -143,7 +169,7 @@ export async function getUserByUsername(username: string): Promise<TeamUser | nu
 }
 
 export async function listUsers(): Promise<PublicTeamUser[]> {
-  const ids = await kv.lrange(USERS_KEY, 0, -1);
+  const ids = [...new Set(await kv.lrange(USERS_KEY, 0, -1))];
   if (!ids.length) return [];
 
   const users = await kv.mget(...ids.map((id: string) => userKey(id)));
@@ -158,8 +184,12 @@ export async function createUser(input: {
   name: string;
   password: string;
   group: string;
+  role?: UserRole;
+  mustChangePassword?: boolean;
 }): Promise<PublicTeamUser> {
-  const id = normalizeUsername(input.username);
+  const validated = validateUserInput(input);
+  if (typeof validated === "string") throw new Error(validated);
+  const id = validated.username;
   const existing = await getUserById(id);
   if (existing) throw new Error("账号已存在");
 
@@ -167,29 +197,19 @@ export async function createUser(input: {
     id,
     email: id,
     username: id,
-    name: input.name.trim(),
-    role: "member",
-    group: input.group,
-    passwordHash: await hashPassword(input.password),
+    name: validated.name,
+    role: validated.role,
+    group: validated.group,
+    passwordHash: await hashPassword(validated.password),
     status: "active",
+    mustChangePassword: input.mustChangePassword ?? true,
     createdAt: Date.now(),
   };
 
-  await kv.set(userKey(user.id), user);
+  const stored = await kv.set(userKey(user.id), user, { nx: true });
+  if (stored !== "OK") throw new Error("账号已存在");
   await kv.lpush(USERS_KEY, user.id);
   return toPublicUser(user);
-}
-
-async function createUserIfMissing(input: {
-  username: string;
-  name: string;
-  password: string;
-  group: string;
-}): Promise<void> {
-  const id = normalizeUsername(input.username);
-  const existing = await getUserById(id);
-  if (existing) return;
-  await createUser({ ...input, username: id });
 }
 
 export async function updateUser(
@@ -199,6 +219,7 @@ export async function updateUser(
     group?: string;
     status?: UserStatus;
     password?: string;
+    role?: UserRole;
   },
   actorId: string
 ): Promise<PublicTeamUser> {
@@ -207,19 +228,26 @@ export async function updateUser(
   if (user.id === actorId && input.status === "disabled") {
     throw new Error("不能禁用当前登录账号");
   }
+  if (user.id === actorId && input.role === "member") {
+    throw new Error("不能移除当前账号的管理员权限");
+  }
 
   const next: TeamUser = {
     ...user,
     name: input.name ?? user.name,
-    role: "member",
+    role: input.role ?? user.role,
     group: input.group ?? user.group,
     status: input.status ?? user.status,
     passwordHash: input.password
       ? await hashPassword(input.password)
       : user.passwordHash,
+    mustChangePassword: input.password ? true : user.mustChangePassword,
   };
 
   await kv.set(userKey(next.id), next);
+  if (input.password || input.status === "disabled" || input.role) {
+    await revokeUserSessions(next.id);
+  }
   return toPublicUser(next);
 }
 
@@ -228,12 +256,13 @@ export async function deleteUser(
   actorId: string
 ): Promise<{ deleted: boolean }> {
   const normalizedId = normalizeUsername(id);
-  if (!normalizedId) throw new Error("缺少账号 ID");
+  if (!isValidUsername(normalizedId)) throw new Error("账号 ID 无效");
   if (normalizedId === actorId) throw new Error("不能删除当前登录账号");
 
   const existing = await getUserById(normalizedId);
   if (!existing) return { deleted: false };
 
+  await revokeUserSessions(normalizedId);
   await kv.del(userKey(normalizedId));
   await kv.lrem(USERS_KEY, 0, normalizedId);
   return { deleted: true };
@@ -246,9 +275,8 @@ export async function changeOwnPassword(input: {
 }): Promise<void> {
   const user = await getUserById(input.userId);
   if (!user || user.status !== "active") throw new Error("账号不存在");
-  if (input.nextPassword.length < 6 || input.nextPassword.length > 72) {
-    throw new Error("新密码长度应为 6-72 位");
-  }
+  const passwordError = validatePassword(input.nextPassword);
+  if (passwordError) throw new Error(passwordError);
   if (input.currentPassword === input.nextPassword) {
     throw new Error("新密码不能与当前密码相同");
   }
@@ -259,7 +287,9 @@ export async function changeOwnPassword(input: {
   await kv.set(userKey(user.id), {
     ...user,
     passwordHash: await hashPassword(input.nextPassword),
+    mustChangePassword: false,
   });
+  await revokeUserSessions(user.id);
 }
 
 export async function authenticateUser(username: string, password: string): Promise<TeamUser | null> {
@@ -269,56 +299,72 @@ export async function authenticateUser(username: string, password: string): Prom
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) return null;
 
-  await kv.set(userKey(user.id), { ...user, lastLoginAt: Date.now() });
-  return { ...user, lastLoginAt: Date.now() };
+  const now = Date.now();
+  await kv.set(userKey(user.id), { ...user, lastLoginAt: now });
+  return { ...user, lastLoginAt: now };
 }
 
 export async function ensureBootstrapAdmin(): Promise<void> {
   const ownerUsername = normalizeUsername(
-    process.env.TEAM_MEMBER_USERNAME ||
-      process.env.TEAM_ADMIN_USERNAME ||
-      process.env.TEAM_ADMIN_EMAIL ||
-      process.env.ADMIN_EMAIL ||
-      "2025754227"
+    process.env.TEAM_ADMIN_USERNAME ||
+      process.env.TEAM_MEMBER_USERNAME ||
+      ""
   );
-  const ownerPassword =
-    process.env.TEAM_MEMBER_PASSWORD ||
-    process.env.TEAM_ADMIN_PASSWORD ||
-    process.env.ADMIN_KEY;
-  if (!ownerPassword) return;
-  if (ownerPassword.length < 6) {
-    console.warn("TEAM_MEMBER_PASSWORD/TEAM_ADMIN_PASSWORD is too short, skip bootstrap member");
+  if (!ownerUsername) return;
+  if (!isValidUsername(ownerUsername)) {
+    console.warn("Admin bootstrap skipped: username must be a 6-20 digit student ID");
     return;
   }
 
+  const ownerPassword =
+    process.env.TEAM_ADMIN_PASSWORD ||
+    process.env.TEAM_MEMBER_PASSWORD ||
+    "";
+
   const existing = await getUserById(ownerUsername);
-  if (!existing) {
-    const legacyAdminEmail = normalizeUsername("3421798408@qq.com");
-    const legacyUser = await getUserById(legacyAdminEmail);
+  if (existing) {
+    if (existing.role !== "admin") {
+      await kv.set(userKey(ownerUsername), {
+        ...existing,
+        role: "admin",
+        mustChangePassword: true,
+      });
+      await revokeUserSessions(ownerUsername);
+    }
+    return;
+  }
+
+  const legacyUsername = normalizeUsername(
+    process.env.TEAM_ADMIN_EMAIL || process.env.ADMIN_EMAIL || ""
+  );
+  if (legacyUsername && legacyUsername !== ownerUsername) {
+    const legacyUser = await getUserById(legacyUsername);
     if (legacyUser) {
       const migrated: TeamUser = {
         ...legacyUser,
         id: ownerUsername,
         email: ownerUsername,
         username: ownerUsername,
-        role: "member",
+        role: "admin",
         name: legacyUser.name || "队员",
+        mustChangePassword: true,
       };
       await kv.set(userKey(ownerUsername), migrated);
       await kv.lpush(USERS_KEY, ownerUsername);
-      await kv.del(userKey(legacyAdminEmail));
-      await kv.lrem(USERS_KEY, 0, legacyAdminEmail);
+      await kv.del(userKey(legacyUsername));
+      await kv.lrem(USERS_KEY, 0, legacyUsername);
+      await revokeUserSessions(legacyUsername);
+      return;
     }
   }
 
-  const migratedExisting = await getUserById(ownerUsername);
-  if (migratedExisting) {
-    await createUserIfMissing({
-      username: "2024754137",
-      name: "新队员",
-      password: DEFAULT_MEMBER_PASSWORD,
-      group: "综合",
-    });
+  if (!ownerPassword) {
+    console.warn("Admin bootstrap skipped: TEAM_ADMIN_PASSWORD is not configured");
+    return;
+  }
+  const passwordError = validatePassword(ownerPassword);
+  if (passwordError) {
+    console.warn(`Admin bootstrap skipped: ${passwordError}`);
     return;
   }
 
@@ -327,13 +373,8 @@ export async function ensureBootstrapAdmin(): Promise<void> {
     name: "队员",
     password: ownerPassword,
     group: "综合",
-  });
-
-  await createUserIfMissing({
-    username: "2024754137",
-    name: "新队员",
-    password: DEFAULT_MEMBER_PASSWORD,
-    group: "综合",
+    role: "admin",
+    mustChangePassword: true,
   });
 }
 

@@ -24,3 +24,30 @@ export async function currentApiMember(): Promise<
 > {
   return currentApiUser();
 }
+
+export async function currentApiAdmin(): Promise<
+  | { ok: true; user: PublicTeamUser }
+  | { ok: false; response: NextResponse }
+> {
+  const auth = await currentApiUser();
+  if (!auth.ok) return auth;
+  if (auth.user.mustChangePassword) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { ok: false, error: "请先修改初始密码" },
+        { status: 403 }
+      ),
+    };
+  }
+  if (auth.user.role !== "admin") {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { ok: false, error: "无管理员权限" },
+        { status: 403 }
+      ),
+    };
+  }
+  return auth;
+}

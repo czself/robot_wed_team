@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { timeline, awards, type Award } from "@/data/awards";
@@ -27,6 +27,15 @@ export default function Competition() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [certificate, setCertificate] = useState<Award | null>(null);
+
+  useEffect(() => {
+    if (!certificate) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCertificate(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [certificate]);
 
   return (
     <section id="competition" className="relative py-32 px-6 overflow-hidden">
@@ -194,6 +203,9 @@ export default function Competition() {
       <AnimatePresence>
         {certificate && (
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${certificate.title} 奖状大图`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

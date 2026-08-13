@@ -80,11 +80,13 @@ export default function Gallery() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {galleryItems.map((item, index) => (
-            <motion.div
+            <motion.button
+              type="button"
               key={item.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.03 + index * 0.04, duration: 0.5 }}
+              aria-label={`查看大图：${item.label}`}
               className={`aspect-square rounded-xl border border-white/5 cursor-pointer overflow-hidden relative group ${
                 index === 0 ? "md:col-span-2 md:row-span-2" : ""
               }`}
@@ -103,7 +105,7 @@ export default function Gallery() {
                   {item.label}
                 </span>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -111,6 +113,9 @@ export default function Gallery() {
       <AnimatePresence>
         {selected !== null && (
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="战队影像大图浏览"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

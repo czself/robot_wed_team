@@ -9,8 +9,9 @@ import {
   type SortKey,
 } from "@/lib/wall";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { getCurrentUser } from "@/lib/session";
+import { currentApiAdmin } from "@/lib/api-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
+import { apiServerError } from "@/lib/api-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -28,12 +29,9 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(url.searchParams.get("offset") || "0", 10);
     const limit = parseInt(url.searchParams.get("limit") || "10", 10);
     const includePending = url.searchParams.get("includePending") === "1";
-    const user = includePending ? await getCurrentUser() : null;
-    if (includePending && !user) {
-      return NextResponse.json(
-        { ok: false, error: "未登录" },
-        { status: 401 }
-      );
+    if (includePending) {
+      const auth = await currentApiAdmin();
+      if (!auth.ok) return auth.response;
     }
 
     const result = await listMessages({
@@ -44,11 +42,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    console.error("wall list failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "wall list failed");
   }
 }
 
@@ -57,13 +51,8 @@ export async function PATCH(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json(
-        { ok: false, error: "未登录" },
-        { status: 401 }
-      );
-    }
+    const auth = await currentApiAdmin();
+    if (!auth.ok) return auth.response;
 
     const body = await req.json().catch(() => null);
     const id = typeof body?.id === "string" ? body.id : "";
@@ -79,13 +68,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, data: message });
   } catch (err) {
     const message = err instanceof Error ? err.message : "审核失败";
-    const status = message === "留言不存在" ? 404 : 500;
-    return NextResponse.json({ ok: false, error: message }, { status });
+    if (message === "留言不存在") {
+      return NextResponse.json({ ok: false, error: message }, { status: 404 });
+    }
+    return apiServerError(err, "wall approve failed", "审核失败");
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") {
       return NextResponse.json(
@@ -142,11 +136,11 @@ export async function POST(req: NextRequest) {
     const msg = await createMessage({ nickname, content, parentId });
     return NextResponse.json({ ok: true, data: msg });
   } catch (err) {
-    console.error("wall post failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : "";
+    if (message === "留言不存在") {
+      return NextResponse.json({ ok: false, error: message }, { status: 404 });
+    }
+    return apiServerError(err, "wall post failed");
   }
 }
 
@@ -158,13 +152,8 @@ export async function DELETE(req: NextRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
 
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json(
-        { ok: false, error: "未登录" },
-        { status: 401 }
-      );
-    }
+    const auth = await currentApiAdmin();
+    if (!auth.ok) return auth.response;
 
     if (!id) {
       return NextResponse.json(
@@ -175,10 +164,6 @@ export async function DELETE(req: NextRequest) {
     const result = await deleteMessage(id);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    console.error("wall delete failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "wall delete failed");
   }
 }

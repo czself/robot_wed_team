@@ -5,12 +5,16 @@ import AdminResourceManager from "@/components/AdminResourceManager";
 import AdminUserCreator from "@/components/AdminUserCreator";
 import { listUsers } from "@/lib/auth";
 import { listResources } from "@/lib/resources";
-import { requireUser } from "@/lib/session";
+import { requireAdmin } from "@/lib/session";
+
+export const metadata = {
+  title: "队内后台",
+};
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalAdminPage() {
-  await requireUser();
+  const currentUser = await requireAdmin();
   const users = await listUsers();
   const resources = await listResources();
 
@@ -63,7 +67,7 @@ export default async function PortalAdminPage() {
         </Link>
       </div>
 
-      <AdminUserCreator initialUsers={users} />
+      <AdminUserCreator initialUsers={users} currentUserId={currentUser.id} />
       <section id="resources" className="space-y-5">
         <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-5">
           <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-rm-red/30 bg-rm-red/10 text-rm-red">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 
 const GROUPS = [
@@ -42,7 +42,8 @@ export default function RecruitForm() {
     setError(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (submitting) return;
     setError(null);
 
@@ -77,7 +78,10 @@ export default function RecruitForm() {
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
         className="max-w-xl mx-auto"
       >
-        <div className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-8 md:p-10 text-center overflow-hidden">
+        <div
+          role="status"
+          className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-8 md:p-10 text-center overflow-hidden"
+        >
           <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-rm-red/10 blur-3xl opacity-60" />
           <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-rm-blue/10 blur-3xl opacity-60" />
 
@@ -109,6 +113,7 @@ export default function RecruitForm() {
               )}
             </div>
             <button
+              type="button"
               onClick={() => {
                 setForm(initialForm);
                 setSuccess(false);
@@ -134,7 +139,7 @@ export default function RecruitForm() {
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-rm-red/10 blur-3xl opacity-60" />
         <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-rm-blue/10 blur-3xl opacity-60" />
 
-        <div className="relative space-y-5">
+        <form className="relative space-y-5" onSubmit={handleSubmit} noValidate>
           <div>
             <p className="text-xs tracking-[0.25em] uppercase text-rm-blue mb-2">
               Application
@@ -146,10 +151,16 @@ export default function RecruitForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
+            <label
+              htmlFor="recruit-name"
+              className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider"
+            >
               姓名 <span className="text-rm-red">*</span>
             </label>
             <input
+              id="recruit-name"
+              name="name"
+              autoComplete="name"
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
               placeholder="你的真实姓名"
@@ -158,15 +169,16 @@ export default function RecruitForm() {
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
+          <fieldset>
+            <legend className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
               性别 <span className="text-rm-red">*</span>
-            </label>
+            </legend>
             <div className="flex gap-2">
               {GENDERS.map((g) => (
                 <button
                   key={g}
                   type="button"
+                  aria-pressed={form.gender === g}
                   onClick={() => update("gender", g)}
                   className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all border ${
                     form.gender === g
@@ -178,13 +190,21 @@ export default function RecruitForm() {
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           <div>
-            <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
+            <label
+              htmlFor="recruit-phone"
+              className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider"
+            >
               电话 <span className="text-rm-red">*</span>
             </label>
             <input
+              id="recruit-phone"
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
               value={form.phone}
               onChange={(e) => update("phone", e.target.value)}
               placeholder="手机号码"
@@ -194,10 +214,16 @@ export default function RecruitForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
+            <label
+              htmlFor="recruit-email"
+              className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider"
+            >
               邮箱 <span className="text-rm-red">*</span>
             </label>
             <input
+              id="recruit-email"
+              name="email"
+              autoComplete="email"
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
               placeholder="QQ 邮箱或其他常用邮箱"
@@ -206,15 +232,16 @@ export default function RecruitForm() {
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-rm-gray mb-2 tracking-wider">
+          <fieldset>
+            <legend className="block text-xs font-medium text-rm-gray mb-2 tracking-wider">
               意向组别 <span className="text-rm-red">*</span>
-            </label>
+            </legend>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {GROUPS.map((g) => (
                 <button
                   key={g.key}
                   type="button"
+                  aria-pressed={form.group === g.key}
                   onClick={() => update("group", g.key)}
                   className={`text-left p-3 rounded-lg transition-all border ${
                     form.group === g.key
@@ -238,13 +265,18 @@ export default function RecruitForm() {
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           <div>
-            <label className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider">
+            <label
+              htmlFor="recruit-note"
+              className="block text-xs font-medium text-rm-gray mb-1.5 tracking-wider"
+            >
               备注 <span className="text-rm-gray/40">（选填）</span>
             </label>
             <textarea
+              id="recruit-note"
+              name="note"
               value={form.note}
               onChange={(e) => update("note", e.target.value)}
               placeholder="个人简介、技能、获奖经历等..."
@@ -261,6 +293,7 @@ export default function RecruitForm() {
 
           {error && (
             <motion.div
+              role="alert"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               className="px-4 py-2.5 rounded-lg bg-rm-red/10 border border-rm-red/30 text-rm-red text-sm text-center"
@@ -270,13 +303,16 @@ export default function RecruitForm() {
           )}
 
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={submitting}
             className="w-full py-3 bg-gradient-to-r from-rm-red to-rm-blue text-white text-sm font-bold rounded-lg transition-all hover:shadow-[0_0_32px_rgba(217,4,41,0.4)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span
+                  aria-hidden="true"
+                  className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+                />
                 提交中...
               </>
             ) : (
@@ -287,7 +323,7 @@ export default function RecruitForm() {
           <p className="text-center text-[11px] text-rm-gray/50 font-mono">
             提交即表示你同意我们将你的信息用于招新联系
           </p>
-        </div>
+        </form>
       </motion.div>
     </div>
   );

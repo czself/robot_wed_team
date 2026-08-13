@@ -2,6 +2,11 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import type { TeamResource } from "@/data/portal";
 import { listResources } from "@/lib/resources";
+import { requirePasswordReadyUser } from "@/lib/session";
+
+export const metadata = {
+  title: "队内资料库",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +42,7 @@ export default async function PortalDocsPage({
 }: {
   searchParams: Promise<{ level?: string | string[]; category?: string | string[] }>;
 }) {
+  await requirePasswordReadyUser();
   const params = await searchParams;
   const level = pickFilter(params.level);
   const category = pickFilter(params.category);

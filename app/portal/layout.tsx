@@ -1,19 +1,27 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { BookOpen, FolderKanban, Shield, Users } from "lucide-react";
+import type { Metadata } from "next";
+import { BookOpen, FolderKanban, KeyRound, Shield, Users } from "lucide-react";
 import LogoutButton from "@/components/LogoutButton";
 import { requireUser } from "@/lib/session";
 
 const navItems = [
   { href: "/portal", label: "总览", icon: FolderKanban },
   { href: "/portal/docs", label: "资料库", icon: BookOpen },
-  { href: "/portal/admin", label: "后台", icon: Shield },
 ];
+
+export const metadata: Metadata = {
+  title: "队员空间",
+  robots: { index: false, follow: false },
+};
 
 export default async function PortalLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
-  if (user.status !== "active") redirect("/login");
+  const visibleNavItems = user.mustChangePassword
+    ? navItems.slice(0, 1)
+    : user.role === "admin"
+      ? [...navItems, { href: "/portal/admin", label: "后台", icon: Shield }]
+      : navItems;
 
   return (
     <div className="min-h-screen bg-[#070707] pt-20">
@@ -29,7 +37,7 @@ export default async function PortalLayout({ children }: { children: ReactNode }
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {navItems
+            {visibleNavItems
               .map((item) => {
                 const Icon = item.icon;
                 return (
@@ -57,13 +65,21 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <div>
               <div className="font-bold text-white">{user.name}</div>
               <div className="text-xs text-rm-gray">
-                {user.group} · 队员
+                {user.group} · {user.role === "admin" ? "管理员" : "队员"}
               </div>
             </div>
           </div>
-          <div className="inline-flex items-center gap-2 text-xs text-rm-gray">
-            <Users className="h-4 w-4 text-rm-blue" />
-            {user.username}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-rm-gray">
+            {user.mustChangePassword && (
+              <span className="inline-flex items-center gap-2 rounded-full border border-rm-red/30 bg-rm-red/10 px-3 py-1.5 text-rm-red">
+                <KeyRound className="h-3.5 w-3.5" />
+                请先修改初始密码
+              </span>
+            )}
+            <span className="inline-flex items-center gap-2">
+              <Users className="h-4 w-4 text-rm-blue" />
+              {user.username}
+            </span>
           </div>
         </div>
 

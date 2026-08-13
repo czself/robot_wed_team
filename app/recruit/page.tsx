@@ -1,9 +1,9 @@
 import RecruitForm from "@/components/RecruitForm";
 
 export const metadata = {
-  title: "招新报名 · YZ Control | RoboMaster 2026",
+  title: "招新报名",
   description:
-    "加入 YZ Control 战队 — 机械、嵌入式、视觉、算法、运营组别火热招新中。",
+    "了解并报名加入 YZ Control 战队的机械、嵌入式、视觉、算法与运营方向。",
 };
 
 export const dynamic = "force-dynamic";

@@ -7,8 +7,9 @@ import {
   deleteEntry,
 } from "@/lib/recruit";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { currentApiUser } from "@/lib/api-auth";
+import { currentApiAdmin } from "@/lib/api-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
+import { apiServerError } from "@/lib/api-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,23 +22,22 @@ function clientIp(req: NextRequest): string {
 
 export async function GET() {
   try {
-    const auth = await currentApiUser();
+    const auth = await currentApiAdmin();
     if (!auth.ok) return auth.response;
 
     const entries = await listEntries();
     entries.sort((a, b) => b.createdAt - a.createdAt);
     return NextResponse.json({ ok: true, data: entries });
   } catch (err) {
-    console.error("recruit list failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "recruit list failed");
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const csrf = rejectCrossOriginMutation(req);
+    if (csrf) return csrf;
+
     const ip = clientIp(req);
     const rl = await checkRateLimit(`recruit:${ip}`);
     if (!rl.allowed) {
@@ -60,11 +60,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { id: entry.id } });
   } catch (err) {
-    console.error("recruit submit failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "recruit submit failed");
   }
 }
 
@@ -73,7 +69,7 @@ export async function DELETE(req: NextRequest) {
     const csrf = rejectCrossOriginMutation(req);
     if (csrf) return csrf;
 
-    const auth = await currentApiUser();
+    const auth = await currentApiAdmin();
     if (!auth.ok) return auth.response;
 
     const url = new URL(req.url);
@@ -88,10 +84,6 @@ export async function DELETE(req: NextRequest) {
     const result = await deleteEntry(id);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    console.error("recruit delete failed:", err);
-    return NextResponse.json(
-      { ok: false, error: "服务器暂时不可用，请稍后再试" },
-      { status: 500 }
-    );
+    return apiServerError(err, "recruit delete failed");
   }
 }

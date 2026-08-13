@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { WallMessageWithReplies, SortKey } from "@/lib/wall";
 
@@ -38,6 +38,7 @@ function Avatar({ name, seed }: { name: string; seed: string }) {
   const first = name.slice(0, 1).toUpperCase();
   return (
     <div
+      aria-hidden="true"
       className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorFor(
         seed
       )} flex items-center justify-center font-black text-white shrink-0 shadow-lg`}
@@ -90,8 +91,10 @@ function MessageCard({
 
             <div className="flex items-center gap-1 mt-3">
               <button
+                type="button"
                 onClick={() => onLike(msg.id)}
-                aria-label={liked ? "取消点赞" : "点赞"}
+                aria-label={liked ? "已点赞" : "点赞"}
+                disabled={liked}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   liked
                     ? "bg-rm-red/20 text-rm-red border border-rm-red/40"
@@ -109,7 +112,9 @@ function MessageCard({
                 <span className="tabular-nums">{msg.likes}</span>
               </button>
               <button
+                type="button"
                 onClick={() => onReply(msg.id, msg.nickname)}
+                aria-label={`回复 ${msg.nickname}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 text-rm-gray hover:bg-rm-blue/10 hover:text-rm-blue border border-white/5 transition-all"
               >
                 回复
@@ -142,7 +147,10 @@ function MessageCard({
                             {r.content}
                           </p>
                           <button
+                            type="button"
                             onClick={() => onLike(r.id)}
+                            aria-label={rliked ? "已点赞" : `点赞 ${r.nickname} 的回复`}
+                            disabled={rliked}
                             className={`flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
                               rliked
                                 ? "bg-rm-red/20 text-rm-red border border-rm-red/40"
@@ -289,7 +297,8 @@ export default function Wall() {
     } catch {}
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!content.trim() || submitting) return;
     setSubmitting(true);
     setNotice(null);
@@ -328,11 +337,20 @@ export default function Wall() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <div className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-5 overflow-hidden">
+        <form
+          onSubmit={handleSubmit}
+          className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-4 md:p-5 overflow-hidden"
+        >
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-rm-red/10 blur-3xl opacity-60" />
           <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-rm-blue/10 blur-3xl opacity-60" />
 
+          <label htmlFor="wall-nickname" className="sr-only">
+            昵称（可选）
+          </label>
           <input
+            id="wall-nickname"
+            name="nickname"
+            autoComplete="nickname"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             placeholder="昵称（可选）"
@@ -340,7 +358,12 @@ export default function Wall() {
             className="w-full mb-3 px-4 py-2.5 rounded-lg bg-rm-dark/60 border border-white/10 focus:border-rm-red/50 focus:ring-1 focus:ring-rm-red/30 outline-none transition-all text-sm placeholder:text-rm-gray/60"
           />
 
+          <label htmlFor="wall-content" className="sr-only">
+            留言内容
+          </label>
           <textarea
+            id="wall-content"
+            name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={
@@ -361,7 +384,9 @@ export default function Wall() {
                     ↳ 回复 @{replyTo.nickname}
                   </span>
                   <button
+                    type="button"
                     onClick={() => setReplyTo(null)}
+                    aria-label="取消回复"
                     className="text-rm-gray hover:text-white"
                   >
                     ✕
@@ -372,20 +397,22 @@ export default function Wall() {
               )}
             </div>
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={!content.trim() || submitting}
               className="px-5 py-2 bg-gradient-to-r from-rm-red to-rm-blue text-white text-sm font-bold rounded-lg transition-all hover:shadow-[0_0_24px_rgba(217,4,41,0.4)] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {submitting ? "发送中..." : "发送 →"}
             </button>
           </div>
-        </div>
+        </form>
       </motion.div>
 
       <div className="flex items-center justify-between mb-4 px-1 flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => changeSort("hot")}
+            aria-pressed={sort === "hot"}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
               sort === "hot"
                 ? "bg-rm-red text-white border border-rm-red/40 shadow-[0_0_12px_rgba(217,4,41,0.3)]"
@@ -395,7 +422,9 @@ export default function Wall() {
             🔥 热门
           </button>
           <button
+            type="button"
             onClick={() => changeSort("new")}
+            aria-pressed={sort === "new"}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
               sort === "new"
                 ? "bg-rm-blue text-white border border-rm-blue/40 shadow-[0_0_12px_rgba(0,200,255,0.3)]"
@@ -410,6 +439,7 @@ export default function Wall() {
             {total > 0 ? `${total} 条留言` : "BE THE FIRST"}
           </span>
           <button
+            type="button"
             onClick={refresh}
             className="hover:text-rm-blue transition-colors flex items-center gap-1"
           >
@@ -419,7 +449,10 @@ export default function Wall() {
       </div>
 
       {notice && (
-        <div className="mb-3 rounded-lg border border-rm-blue/30 bg-rm-blue/10 px-4 py-3 text-sm text-rm-blue">
+        <div
+          role="status"
+          className="mb-3 rounded-lg border border-rm-blue/30 bg-rm-blue/10 px-4 py-3 text-sm text-rm-blue"
+        >
           {notice}
         </div>
       )}
@@ -429,9 +462,10 @@ export default function Wall() {
           加载中...
         </div>
       ) : error ? (
-        <div className="text-center py-16">
+        <div role="alert" className="text-center py-16">
           <p className="text-rm-red text-sm mb-2">{error}</p>
           <button
+            type="button"
             onClick={refresh}
             className="text-rm-blue hover:underline text-sm"
           >
@@ -466,6 +500,7 @@ export default function Wall() {
       {totalPages > 1 && !loading && !error && (
         <div className="mt-8 flex items-center justify-center gap-2">
           <button
+            type="button"
             onClick={() => goToPage(page - 1)}
             disabled={page === 0}
             className="w-9 h-9 rounded-lg glass flex items-center justify-center text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:text-rm-red transition-colors"
@@ -476,7 +511,10 @@ export default function Wall() {
           {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
             <button
               key={p}
+              type="button"
               onClick={() => goToPage(p)}
+              aria-label={`第 ${p + 1} 页`}
+              aria-current={page === p ? "page" : undefined}
               className={`w-9 h-9 rounded-lg text-sm font-mono transition-all ${
                 page === p
                   ? "bg-gradient-to-br from-rm-red to-rm-blue text-white shadow-lg"
@@ -487,6 +525,7 @@ export default function Wall() {
             </button>
           ))}
           <button
+            type="button"
             onClick={() => goToPage(page + 1)}
             disabled={page >= totalPages - 1}
             className="w-9 h-9 rounded-lg glass flex items-center justify-center text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:text-rm-blue transition-colors"
