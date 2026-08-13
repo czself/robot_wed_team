@@ -1,3 +1,5 @@
+import { TEAM_GROUPS } from "@/data/team-directions";
+
 export const schools = [
   "成都大学", "成都工业学院", "成都信息工程大学", "重庆大学", "重庆第二师范学院",
   "重庆交通大学", "重庆理工大学", "重庆三峡学院", "重庆邮电大学", "大连大学",
@@ -46,6 +48,4 @@ export const schools = [
   "中国海洋大学", "中国农业大学", "中国人民大学", "中南民族大学", "中央民族大学",
 ];
 
-export const groups = [
-  "机械组", "嵌入式组", "视觉组", "算法组", "运营组",
-];
+export const groups = TEAM_GROUPS;

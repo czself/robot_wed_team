@@ -16,14 +16,14 @@ describe("account input validation", () => {
         username: " 20260001 ",
         name: " 新队员 ",
         password: "control2026",
-        group: "嵌入式组",
+        group: "电控组",
         role: "admin",
       })
     ).toEqual({
       username: "20260001",
       name: "新队员",
       password: "control2026",
-      group: "嵌入式组",
+      group: "电控组",
       role: "admin",
     });
   });

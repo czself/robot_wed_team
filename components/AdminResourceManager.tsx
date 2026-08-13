@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw, Save, Trash2 } from "lucide-react";
 import type { TeamResource } from "@/data/portal";
+import { RESOURCE_CATEGORIES } from "@/data/team-directions";
 
-const categories: TeamResource["category"][] = ["嵌入式", "机械", "视觉", "算法", "运营", "战队管理"];
+const categories = RESOURCE_CATEGORIES;
 const levels: TeamResource["level"][] = ["入门", "进阶", "项目", "规范"];
 
 export default function AdminResourceManager({

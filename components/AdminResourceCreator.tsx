@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FilePlus, Plus, RefreshCw } from "lucide-react";
 import type { TeamResource } from "@/data/portal";
+import { RESOURCE_CATEGORIES } from "@/data/team-directions";
 
-const categories: TeamResource["category"][] = ["嵌入式", "机械", "视觉", "算法", "运营", "战队管理"];
+const categories = RESOURCE_CATEGORIES;
 const levels: TeamResource["level"][] = ["入门", "进阶", "项目", "规范"];
 
 export default function AdminResourceCreator() {
   const router = useRouter();
   const [form, setForm] = useState({
     title: "",
-    category: "嵌入式" as TeamResource["category"],
+    category: "电控" as TeamResource["category"],
     level: "入门" as TeamResource["level"],
     href: "",
     summary: "",
@@ -44,7 +45,7 @@ export default function AdminResourceCreator() {
       router.refresh();
       setForm({
         title: "",
-        category: "嵌入式",
+        category: "电控",
         level: "入门",
         href: "",
         summary: "",

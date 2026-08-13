@@ -3,7 +3,7 @@ import RecruitForm from "@/components/RecruitForm";
 export const metadata = {
   title: "招新报名",
   description:
-    "了解并报名加入 YZ Control 战队的机械、嵌入式、视觉、算法与运营方向。",
+    "了解并报名加入 YZ Control 战队的机械组或电控组；视觉自瞄与控制算法归入电控方向。",
 };
 
 export const dynamic = "force-dynamic";
@@ -16,28 +16,10 @@ const tracks = [
     work: "负责底盘、云台、发射机构、整车装配与可靠性优化。",
   },
   {
-    name: "嵌入式组",
-    role: "电控固件、传感器、运动控制",
-    starter: "C 语言 / STM32 / PID / CAN",
-    work: "负责底盘、云台、发射机构控制，让机器人稳定响应操作。",
-  },
-  {
-    name: "视觉组",
-    role: "识别、追踪、自瞄与部署",
-    starter: "Python / OpenCV / Linux / C++",
-    work: "负责装甲板识别、目标追踪、弹道补偿和上车部署。",
-  },
-  {
-    name: "算法组",
-    role: "导航、决策、路径规划",
-    starter: "数学基础 / Python / ROS 思维",
-    work: "负责自动巡逻、目标决策、策略优化和仿真验证。",
-  },
-  {
-    name: "运营组",
-    role: "宣传、摄影、剪辑、外联",
-    starter: "文案 / 设计 / 视频 / 沟通",
-    work: "负责战队账号、赛事记录、招新宣传、赞助和活动组织。",
+    name: "电控组",
+    role: "嵌入式控制、视觉自瞄、传感器与运动控制",
+    starter: "C/C++ / STM32 / CAN / PID / OpenCV",
+    work: "负责机器人固件、电机与通信，并承担视觉识别、自瞄部署和控制算法调试。",
   },
 ];
 
@@ -90,7 +72,7 @@ export default function RecruitPage() {
               </span>
             </h1>
             <p className="mt-6 text-rm-gray text-base md:text-lg leading-relaxed max-w-2xl">
-              面向对机器人、工程实践、赛事运营感兴趣的同学。不会可以学，关键是愿意动手、愿意复盘、愿意和团队一起把机器调到能打。
+              面向对机器人和工程实践感兴趣的同学。不会可以学，关键是愿意动手、愿意复盘、愿意和团队一起把机器调到能打。
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -139,7 +121,7 @@ export default function RecruitPage() {
             <h2 className="text-3xl md:text-5xl font-black">选择你的方向</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+          <div className="grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
             {tracks.map((track) => (
               <article
                 key={track.name}

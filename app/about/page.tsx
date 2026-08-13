@@ -8,7 +8,7 @@ import Development from "@/components/Development";
 export const metadata: Metadata = {
   title: "关于战队",
   description:
-    "了解 YZ Control 的六大技术方向、参赛机器人、比赛经历、成长历程与战队影像。",
+    "了解 YZ Control 的机械组与电控组、参赛机器人、比赛经历、成长历程与战队影像。",
 };
 
 export default function AboutPage() {

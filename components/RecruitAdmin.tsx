@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Download, Eye, RefreshCw, Search, Trash2 } from "lucide-react";
+import { getRecruitGroupLabel } from "@/data/team-directions";
 
 interface RecruitEntry {
   id: string;
@@ -13,14 +14,6 @@ interface RecruitEntry {
   note?: string;
   createdAt: number;
 }
-
-const GROUP_LABELS: Record<string, string> = {
-  mechanical: "机械组",
-  embedded: "嵌入式组",
-  vision: "视觉组",
-  algorithm: "算法组",
-  operations: "运营组",
-};
 
 function formatTime(ms: number): string {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -52,7 +45,7 @@ export default function RecruitAdmin({
     const q = query.trim().toLowerCase();
     if (!q) return entries;
     return entries.filter((entry) => {
-      const group = GROUP_LABELS[entry.group] || entry.group;
+      const group = getRecruitGroupLabel(entry.group);
       return [entry.name, entry.gender, entry.phone, entry.email, group, entry.note || ""]
         .join(" ")
         .toLowerCase()
@@ -63,7 +56,7 @@ export default function RecruitAdmin({
   const groupStats = useMemo(() => {
     const stats = new Map<string, number>();
     for (const entry of entries) {
-      const label = GROUP_LABELS[entry.group] || entry.group;
+      const label = getRecruitGroupLabel(entry.group);
       stats.set(label, (stats.get(label) || 0) + 1);
     }
     return Array.from(stats.entries());
@@ -96,7 +89,7 @@ export default function RecruitAdmin({
       entry.gender,
       entry.phone,
       entry.email,
-      GROUP_LABELS[entry.group] || entry.group,
+      getRecruitGroupLabel(entry.group),
       entry.note || "",
       entry.id,
     ]);
@@ -266,7 +259,7 @@ export default function RecruitAdmin({
                   <td className="whitespace-nowrap px-4 py-3">{entry.email}</td>
                   <td className="whitespace-nowrap px-4 py-3">
                     <span className="rounded-full border border-rm-blue/30 bg-rm-blue/10 px-2.5 py-1 text-xs font-bold text-rm-blue">
-                      {GROUP_LABELS[entry.group] || entry.group}
+                      {getRecruitGroupLabel(entry.group)}
                     </span>
                   </td>
                   <td className="max-w-xs px-4 py-3 text-rm-gray">
@@ -309,7 +302,7 @@ export default function RecruitAdmin({
                   </p>
                 </div>
                 <span className="rounded-full border border-rm-blue/30 bg-rm-blue/10 px-2.5 py-1 text-xs font-bold text-rm-blue">
-                  {GROUP_LABELS[entry.group] || entry.group}
+                  {getRecruitGroupLabel(entry.group)}
                 </span>
               </div>
               <div className="grid gap-2 text-sm text-rm-gray">

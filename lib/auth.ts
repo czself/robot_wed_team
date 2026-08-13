@@ -5,6 +5,11 @@ import { randomBytes, scrypt, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { validatePassword } from "@/lib/security";
 import { revokeUserSessions } from "@/lib/session-store";
+import {
+  DEFAULT_TEAM_GROUP,
+  isTeamGroup,
+  normalizeTeamGroup,
+} from "@/data/team-directions";
 
 export type UserRole = "admin" | "member";
 export type UserStatus = "active" | "disabled";
@@ -40,8 +45,6 @@ const scryptAsync = promisify(scrypt);
 
 const USERS_KEY = "team:users";
 const USER_PREFIX = "team:user:";
-const GROUPS = ["机械组", "嵌入式组", "视觉组", "算法组", "运营组", "综合"];
-
 function normalizeUsername(username: string): string {
   return username.trim().toLowerCase();
 }
@@ -58,6 +61,7 @@ function normalizeStoredUser(user: TeamUser): TeamUser {
   return {
     ...user,
     role: user.role === "admin" ? "admin" : "member",
+    group: normalizeTeamGroup(user.group),
     mustChangePassword: Boolean(user.mustChangePassword),
   };
 }
@@ -88,14 +92,14 @@ export function validateUserInput(input: unknown):
   const username = normalizeUsername(String(b.username ?? b.email ?? ""));
   const name = String(b.name ?? "").trim();
   const password = String(b.password ?? "");
-  const group = String(b.group ?? "综合").trim() || "综合";
+  const group = String(b.group ?? DEFAULT_TEAM_GROUP).trim() || DEFAULT_TEAM_GROUP;
   const role = b.role === undefined || b.role === "member" ? "member" : b.role === "admin" ? "admin" : null;
 
   if (!isValidUsername(username)) return "用户名必须是 6-20 位数字学号";
   if (!name || name.length > 24) return "姓名必填（最多 24 字）";
   const passwordError = validatePassword(password);
   if (passwordError) return passwordError;
-  if (!GROUPS.includes(group)) return "组别无效";
+  if (!isTeamGroup(group)) return "组别无效";
   if (!role) return "账号权限无效";
 
   return { username, name, password, group, role };
@@ -124,7 +128,7 @@ export function validateUserUpdateInput(input: unknown):
 
   if (!isValidUsername(id)) return "账号 ID 无效";
   if (name !== undefined && (!name || name.length > 24)) return "姓名必填（最多 24 字）";
-  if (group !== undefined && !GROUPS.includes(group)) return "组别无效";
+  if (group !== undefined && !isTeamGroup(group)) return "组别无效";
   if (b.role !== undefined && role === undefined) return "账号权限无效";
   if (password !== undefined) {
     const passwordError = validatePassword(password);
@@ -372,7 +376,7 @@ export async function ensureBootstrapAdmin(): Promise<void> {
     username: ownerUsername,
     name: "队员",
     password: ownerPassword,
-    group: "综合",
+    group: DEFAULT_TEAM_GROUP,
     role: "admin",
     mustChangePassword: true,
   });

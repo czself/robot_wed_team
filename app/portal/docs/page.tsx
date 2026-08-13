@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import type { TeamResource } from "@/data/portal";
+import { RESOURCE_CATEGORIES } from "@/data/team-directions";
 import { listResources } from "@/lib/resources";
 import { requirePasswordReadyUser } from "@/lib/session";
 
@@ -21,12 +22,7 @@ function formatDate(ms: number): string {
 const levels: Array<TeamResource["level"] | "全部"> = ["全部", "入门", "进阶", "项目", "规范"];
 const categories: Array<TeamResource["category"] | "全部"> = [
   "全部",
-  "嵌入式",
-  "机械",
-  "视觉",
-  "算法",
-  "运营",
-  "战队管理",
+  ...RESOURCE_CATEGORIES,
 ];
 
 function pickFilter(value: string | string[] | undefined): string {

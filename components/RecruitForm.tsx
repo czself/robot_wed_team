@@ -5,10 +5,7 @@ import { motion } from "framer-motion";
 
 const GROUPS = [
   { key: "mechanical", label: "机械组", desc: "结构设计 / 加工装配" },
-  { key: "embedded", label: "嵌入式组", desc: "固件开发 / 运动控制" },
-  { key: "vision", label: "视觉组", desc: "识别追踪 / 自瞄部署" },
-  { key: "algorithm", label: "算法组", desc: "导航决策 / 路径规划" },
-  { key: "operations", label: "运营组", desc: "宣传策划 / 赛事外联" },
+  { key: "electrical", label: "电控组", desc: "嵌入式控制 / 视觉自瞄" },
 ];
 
 const GENDERS = ["男", "女", "其他"];

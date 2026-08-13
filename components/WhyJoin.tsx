@@ -16,18 +16,18 @@ const benefits = [
   },
   {
     icon: "⚡",
-    title: "嵌入式工程能力",
-    desc: "掌握 STM32、FreeRTOS、CAN、PID 等工业级嵌入式技术",
-  },
-  {
-    icon: "👁️",
-    title: "AI+机器人交叉",
-    desc: "学习 YOLO、OpenCV、TensorRT，赋予机器人视觉与决策能力",
+    title: "电控与视觉能力",
+    desc: "从 STM32、FreeRTOS、CAN、PID 到 OpenCV、YOLO 自瞄，视觉模块归入电控方向",
   },
   {
     icon: "🔧",
-    title: "动手创造一切",
-    desc: "从 PCB 设计到 3D 打印，从代码到机械结构，全栈工程师",
+    title: "机械设计与制造",
+    desc: "从 CAD 建模、加工装配到可靠性优化，让每一代机器人稳定上场",
+  },
+  {
+    icon: "🧪",
+    title: "整车联调实战",
+    desc: "从 PCB 和线束到 3D 打印与整车调试，在真实赛场需求中完成闭环",
   },
   {
     icon: "👥",

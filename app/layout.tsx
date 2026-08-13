@@ -33,12 +33,12 @@ export const metadata: Metadata = {
     template: "%s · YZ Control",
   },
   description:
-    "YZ Control 是豫章师范学院 RoboMaster 战队，专注机器人机械设计、嵌入式控制、计算机视觉、导航算法与赛事运营。",
+    "YZ Control 是豫章师范学院 RoboMaster 战队，专注机器人机械设计与电控开发；视觉自瞄和控制算法归入电控方向。",
   keywords: ["RoboMaster", "3v3", "步兵对抗赛", "YZ Control", "机器人", "战队", "招新", "RM2026"],
   openGraph: {
     title: "YZ Control | 豫章师范学院 RoboMaster 战队",
     description:
-      "从机械结构、嵌入式控制到视觉自瞄和自主导航，我们一起把机器人送上赛场。",
+      "机械组与电控组协作，从结构设计、电机控制到视觉自瞄，把机器人送上赛场。",
     url: "/",
     siteName: "YZ Control",
     locale: "zh_CN",

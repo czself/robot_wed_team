@@ -1,5 +1,9 @@
 import { kv } from "@/lib/kv";
 import nodemailer from "nodemailer";
+import {
+  getRecruitGroupLabel,
+  isRecruitDirectionKey,
+} from "@/data/team-directions";
 
 export interface RecruitEntry {
   id: string;
@@ -14,8 +18,6 @@ export interface RecruitEntry {
 
 const ENTRIES_KEY = "recruit:entries";
 const META_PREFIX = "recruit:entry:";
-
-const GROUPS = ["mechanical", "embedded", "vision", "algorithm", "operations"];
 
 function genId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
@@ -35,7 +37,7 @@ export function validateEntry(input: unknown): Omit<RecruitEntry, "id" | "create
   if (gender !== "男" && gender !== "女" && gender !== "其他") return "性别无效";
   if (!/^1[3-9]\d{9}$/.test(phone)) return "手机号格式不正确";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "邮箱格式不正确";
-  if (!GROUPS.includes(group)) return "意向组别无效";
+  if (!isRecruitDirectionKey(group)) return "意向组别无效";
 
   return { name, gender, phone, email, group, note };
 }
@@ -72,14 +74,6 @@ export async function deleteEntry(id: string): Promise<{ deleted: boolean }> {
   return { deleted: Boolean(existed) };
 }
 
-const GROUP_LABELS: Record<string, string> = {
-  mechanical: "机械组",
-  embedded: "嵌入式组",
-  vision: "视觉组",
-  algorithm: "算法组",
-  operations: "运营组",
-};
-
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -112,7 +106,7 @@ export async function sendMailNotice(entry: RecruitEntry): Promise<void> {
     `性别：${entry.gender}`,
     `电话：${entry.phone}`,
     `邮箱：${entry.email}`,
-    `意向组别：${GROUP_LABELS[entry.group] || entry.group}`,
+    `意向组别：${getRecruitGroupLabel(entry.group)}`,
   ];
   if (entry.note) lines.push(`备注：${entry.note}`);
   lines.push(`提交时间：${new Date(entry.createdAt).toLocaleString("zh-CN")}`);
@@ -140,7 +134,7 @@ export async function sendMailNotice(entry: RecruitEntry): Promise<void> {
   await transporter.sendMail({
     from: `"YZ Control 招新" <${user}>`,
     to,
-    subject: `【新报名】${entry.name} · ${GROUP_LABELS[entry.group] || entry.group}`,
+    subject: `【新报名】${entry.name} · ${getRecruitGroupLabel(entry.group)}`,
     text: lines.join("\n"),
     html,
   });

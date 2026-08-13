@@ -5,7 +5,7 @@ import TrainingPath from "@/components/TrainingPath";
 export const metadata: Metadata = {
   title: "技术星图",
   description:
-    "探索 YZ Control 机械、嵌入式、视觉、算法等技术方向及队员训练成长路线。",
+    "探索 YZ Control 的机械与电控两大方向；视觉自瞄与控制算法归入电控训练路线。",
 };
 
 export default function TechPage() {

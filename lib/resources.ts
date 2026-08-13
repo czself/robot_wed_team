@@ -2,6 +2,10 @@ import "server-only";
 
 import { kv } from "@/lib/kv";
 import { defaultResources, type TeamResource } from "@/data/portal";
+import {
+  isResourceCategory,
+  normalizeResourceCategory,
+} from "@/data/team-directions";
 
 const RESOURCES_KEY = "team:resources";
 const RESOURCE_PREFIX = "team:resource:";
@@ -37,7 +41,11 @@ export async function listResources(): Promise<TeamResource[]> {
     : [];
 
   return [
-    ...customResources.map((resource) => ({ ...resource, source: "custom" as const })),
+    ...customResources.map((resource) => ({
+      ...resource,
+      category: normalizeResourceCategory(String(resource.category)),
+      source: "custom" as const,
+    })),
     ...defaultResources.map((resource) => ({ ...resource, source: "default" as const })),
   ]
     .sort((a, b) => b.updatedAt - a.updatedAt);
@@ -55,7 +63,7 @@ export function validateResourceInput(input: unknown):
   const summary = String(b.summary ?? "").trim();
 
   if (!title || title.length > 48) return "标题必填（最多 48 字）";
-  if (!["嵌入式", "机械", "视觉", "算法", "运营", "战队管理"].includes(category)) return "分类无效";
+  if (!isResourceCategory(category)) return "分类无效";
   if (!["入门", "进阶", "项目", "规范"].includes(level)) return "等级无效";
   if (!href || href.length > 240) return "链接必填（最多 240 字）";
   if (!isSafeHref(href)) return "链接只支持站内路径或 http(s) 地址";

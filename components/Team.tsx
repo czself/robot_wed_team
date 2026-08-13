@@ -25,11 +25,11 @@ export default function Team() {
             <span className="text-rm-blue">Team</span>
           </p>
           <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rm-red via-white to-rm-blue bg-clip-text text-transparent">
-            六大技术方向
+            两大技术方向
           </h1>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
           {teamGroups.map((group, index) => (
             <motion.article
               key={group.id}

@@ -131,7 +131,7 @@ export default function About() {
         >
           <p className="text-rm-gray text-lg leading-relaxed">
             YZ Control，2025 年成立，首战即斩获 RoboMaster 步兵对抗赛国二、3v3 国三。
-            从机械结构到 STM32 嵌入式，从视觉自瞄到哨兵自主决策，我们用代码和钢铁，
+            机械组负责结构与装配，电控组覆盖嵌入式控制、视觉自瞄与控制算法；我们用代码和钢铁，
             在赛场上书写属于我们的传奇。
           </p>
         </motion.div>

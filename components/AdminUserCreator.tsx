@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import type { PublicTeamUser, UserRole, UserStatus } from "@/lib/auth";
 import { MIN_PASSWORD_LENGTH, validatePassword } from "@/lib/security";
+import { DEFAULT_TEAM_GROUP, TEAM_GROUPS } from "@/data/team-directions";
 
-const groups = ["机械组", "嵌入式组", "视觉组", "算法组", "运营组", "综合"];
+const groups = TEAM_GROUPS;
 
 export default function AdminUserCreator({
   initialUsers,
@@ -28,7 +29,7 @@ export default function AdminUserCreator({
     username: "",
     name: "",
     password: "",
-    group: "嵌入式组",
+    group: DEFAULT_TEAM_GROUP,
     role: "member" as UserRole,
   });
   const [loading, setLoading] = useState(false);
@@ -130,7 +131,7 @@ export default function AdminUserCreator({
         username: "",
         name: "",
         password: "",
-        group: "嵌入式组",
+        group: DEFAULT_TEAM_GROUP,
         role: "member",
       });
     } catch (e) {
@@ -209,7 +210,7 @@ export default function AdminUserCreator({
           <div>
             <select
               value={form.group}
-              onChange={(e) => update("group", e.target.value)}
+              onChange={(e) => update("group", e.target.value as (typeof groups)[number])}
               className="h-10 w-full rounded-lg border border-white/10 bg-rm-dark/70 px-3 text-sm text-white outline-none focus:border-rm-blue/50"
             >
               {groups.map((group) => (

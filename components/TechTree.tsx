@@ -17,9 +17,9 @@ const techTree: TechNode[] = [
     description: "RoboMaster 2026 赛季 3v3 对抗，步兵/英雄/哨兵三台机器人协同作战",
     children: [
       {
-        id: "embedded",
-        label: "Embedded",
-        description: "STM32F407 + FreeRTOS 实时控制系统，50Hz 控制环 + 200Hz 电机环 + 1kHz INS",
+        id: "electrical",
+        label: "Electrical Control",
+        description: "电控组负责 STM32 + FreeRTOS 实时控制、电机闭环、通信与视觉自瞄模块",
         children: [
           { id: "stm32f407", label: "STM32F407", description: "168MHz Cortex-M4F，步兵主控 MCU" },
           { id: "freertos", label: "FreeRTOS", description: "实时操作系统，多任务调度与看门狗守护" },
@@ -39,14 +39,14 @@ const techTree: TechNode[] = [
         ],
       },
       {
-        id: "vision",
-        label: "Vision & AI",
-        description: "自瞄系统与哨兵自主决策，赋予机器人感知与判断能力",
+        id: "vision-autoaim",
+        label: "Vision & Auto Aim",
+        description: "电控方向内的视觉自瞄模块：感知、识别、解算与云台联动",
         children: [
           { id: "yolo", label: "YOLOv8", description: "装甲板实时检测与识别" },
           { id: "tensorrt", label: "TensorRT", description: "边缘端模型推理加速" },
           { id: "opencv", label: "OpenCV", description: "相机标定与图像处理管线" },
-          { id: "strategy", label: "Strategy", description: "哨兵自主巡逻、路径规划与策略决策" },
+          { id: "autoaim", label: "Auto Aim", description: "PnP 解算、弹道补偿与云台控制联动" },
         ],
       },
     ],
