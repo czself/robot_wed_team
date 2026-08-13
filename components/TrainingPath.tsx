@@ -2,77 +2,19 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-
-const phases = [
-  {
-    year: "大一上",
-    title: "入门 · 点亮第一个 LED",
-    color: "from-rm-blue/20 to-rm-blue/5",
-    borderColor: "border-rm-blue/40",
-    glowColor: "shadow-rm-blue/10",
-    skills: [
-      "C 语言基础",
-      "STM32 GPIO 控制",
-      "串口通信 UART",
-      "点亮 LED / 蜂鸣器",
-      "搭建开发环境",
-    ],
-  },
-  {
-    year: "大一下",
-    title: "进阶 · 让电机转起来",
-    color: "from-rm-blue/30 to-rm-red/5",
-    borderColor: "border-rm-blue/50",
-    glowColor: "shadow-rm-blue/20",
-    skills: [
-      "CAN 总线通信",
-      "PID 控制算法",
-      "FreeRTOS 入门",
-      "电机驱动与控制",
-      "机器人模块拆解",
-    ],
-  },
-  {
-    year: "大二上",
-    title: "实战 · 独立负责模块",
-    color: "from-rm-red/20 to-rm-blue/5",
-    borderColor: "border-rm-red/40",
-    glowColor: "shadow-rm-red/10",
-    skills: [
-      "自主开发子系统",
-      "IMU 姿态解算",
-      "OpenCV 图像处理",
-      "YOLO 目标检测",
-      "视觉自瞄上车",
-    ],
-  },
-  {
-    year: "大二下",
-    title: "领航 · 带队 & 带新人",
-    color: "from-rm-red/30 to-rm-blue/10",
-    borderColor: "border-rm-red/50",
-    glowColor: "shadow-rm-red/20",
-    skills: [
-      "担任技术负责人",
-      "指导新人培训",
-      "系统架构设计",
-      "整车联调与故障复盘",
-      "RoboMaster 核心",
-    ],
-  },
-];
+import { trainingTracks } from "@/data/tech-star";
 
 export default function TrainingPath() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const [activePhase, setActivePhase] = useState<number | null>(null);
+  const [activePhase, setActivePhase] = useState<string | null>(null);
 
   return (
     <section id="training" className="relative py-24 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-rm-blue/5 blur-[150px] pointer-events-none" />
 
-      <div className="max-w-5xl mx-auto relative" ref={ref}>
+      <div className="max-w-7xl mx-auto relative" ref={ref}>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -87,71 +29,79 @@ export default function TrainingPath() {
             新人培养路线
           </h2>
           <p className="mt-4 text-rm-gray text-sm">
-            从零开始，一步步成长为机器人工程师
+            机械设计制造与电控研发各有完整路线，从零开始也能找到自己的方向
           </p>
           <p className="text-rm-gray/60 text-xs mt-2">
             不会没关系，我们教
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {phases.map((phase, index) => (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {trainingTracks.map((track, trackIndex) => (
             <motion.div
-              key={phase.year}
+              key={track.id}
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 + index * 0.15, duration: 0.6 }}
-              onMouseEnter={() => setActivePhase(index)}
-              onMouseLeave={() => setActivePhase(null)}
-              className={`relative p-5 rounded-xl border ${phase.borderColor} bg-gradient-to-b ${phase.color} backdrop-blur-sm cursor-pointer transition-all duration-300 ${
-                activePhase === index
-                  ? `scale-105 shadow-xl ${phase.glowColor}`
-                  : "hover:scale-[1.02]"
-              }`}
+              transition={{ delay: 0.2 + trackIndex * 0.15, duration: 0.6 }}
+              className={`relative p-5 md:p-6 rounded-2xl border ${track.borderColor} ${track.bgColor} backdrop-blur-sm`}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg font-black ${
-                  index < 2 ? "bg-rm-blue/20 text-rm-blue" : "bg-rm-red/20 text-rm-red"
-                }`}>
-                  {index + 1}
+              <div className="flex items-center gap-4 mb-6">
+                <div className={`w-12 h-12 rounded-xl border ${track.borderColor} bg-black/20 flex items-center justify-center text-2xl`}>
+                  {track.icon}
                 </div>
                 <div>
-                  <p className="text-xs font-mono text-rm-gray tracking-wider">
-                    {phase.year}
-                  </p>
-                  <p className="text-sm font-bold text-white">
-                    {phase.title}
-                  </p>
+                  <h3 className={`text-xl font-black ${track.color}`}>{track.name}</h3>
+                  <p className="text-xs text-rm-gray/60 tracking-wider uppercase">{track.nameEn}</p>
                 </div>
               </div>
 
-              <ul className="space-y-2">
-                {phase.skills.map((skill, i) => (
-                  <li
-                    key={i}
-                    className={`flex items-center gap-2 text-xs transition-all duration-300 ${
-                      activePhase === index
-                        ? "text-white translate-x-1"
-                        : "text-rm-gray"
-                    }`}
-                    style={{ transitionDelay: `${i * 50}ms` }}
-                  >
-                    <span className={`w-1 h-1 rounded-full transition-colors ${
-                      activePhase === index
-                        ? index < 2 ? "bg-rm-blue" : "bg-rm-red"
-                        : "bg-rm-gray/40"
-                    }`} />
-                    {skill}
-                  </li>
-                ))}
-              </ul>
+              <p className="text-sm text-rm-gray leading-relaxed mb-6">{track.description}</p>
 
-              {/* 箭头连接 */}
-              {index < phases.length - 1 && (
-                <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-rm-gray/40 text-xl">
-                  →
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {track.stages.map((stage, stageIndex) => {
+                  const phaseId = `${track.id}-${stage.level}`;
+                  const isActive = activePhase === phaseId;
+
+                  return (
+                    <div
+                      key={stage.level}
+                      onMouseEnter={() => setActivePhase(phaseId)}
+                      onMouseLeave={() => setActivePhase(null)}
+                      className={`relative p-4 rounded-xl border border-white/10 bg-black/20 transition-all duration-300 ${
+                        isActive ? "-translate-y-1 border-white/25 shadow-xl" : "hover:border-white/20"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3 mb-4">
+                        <div className={`w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-sm font-black ${track.bgColor} ${track.color}`}>
+                          {stageIndex + 1}
+                        </div>
+                        <div>
+                          <p className="text-xs font-mono text-rm-gray/60">{stage.period}</p>
+                          <p className="text-sm font-bold text-white">{stage.title}</p>
+                        </div>
+                      </div>
+
+                      <ul className="space-y-2">
+                        {stage.items.map((item) => (
+                          <li
+                            key={item}
+                            className={`flex items-start gap-2 text-xs transition-colors ${isActive ? "text-white" : "text-rm-gray"}`}
+                          >
+                            <span className={`mt-1.5 w-1 h-1 shrink-0 rounded-full ${track.dotColor}`} />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+
+                      {stageIndex % 2 === 0 && stageIndex < track.stages.length - 1 && (
+                        <div className="hidden sm:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-rm-gray/30 text-lg">
+                          →
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           ))}
         </div>

@@ -9,6 +9,7 @@ import {
   normalizeResourceCategory,
   normalizeTeamGroup,
 } from "@/data/team-directions";
+import { trainingTracks } from "@/data/tech-star";
 
 describe("two-direction team model", () => {
   it("only accepts mechanical and electrical account groups", () => {
@@ -38,5 +39,17 @@ describe("two-direction team model", () => {
     expect(normalizeResourceCategory("视觉")).toBe("电控");
     expect(normalizeResourceCategory("算法")).toBe("电控");
     expect(normalizeResourceCategory("运营")).toBe("电控");
+  });
+
+  it("provides complete growth paths for both technical groups", () => {
+    expect(trainingTracks.map((track) => track.id)).toEqual(["mechanical", "electrical"]);
+    expect(trainingTracks.every((track) => track.stages.length === 4)).toBe(true);
+    expect(trainingTracks.every((track) => track.stages.every((stage) => stage.items.length >= 5))).toBe(true);
+
+    const mechanical = trainingTracks.find((track) => track.id === "mechanical");
+    const electrical = trainingTracks.find((track) => track.id === "electrical");
+
+    expect(mechanical?.stages.flatMap((stage) => stage.items)).toContain("SolidWorks 基础建模");
+    expect(electrical?.stages.flatMap((stage) => stage.items)).toContain("视觉自瞄上车");
   });
 });

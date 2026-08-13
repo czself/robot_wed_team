@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { starFields, trainingLevels, type StarField } from "@/data/tech-star";
+import { starFields, trainingTracks, type StarField } from "@/data/tech-star";
 
 function TechDetail({ field, onBack }: { field: StarField; onBack: () => void }) {
   return (
@@ -133,7 +133,7 @@ export default function TechStarMap() {
               </div>
 
               {/* 星球网格 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
                 {starFields.map((field, index) => (
                   <motion.button
                     key={field.id}
@@ -171,39 +171,48 @@ export default function TechStarMap() {
                     <span className="text-rm-red">Path</span>
                   </p>
                   <h2 className="text-3xl font-black text-white">
-                    新人成长路线 🌱
+                    机械组 / 电控组成长路线 🌱
                   </h2>
                   <p className="mt-2 text-rm-gray text-sm">
-                    从零开始，一步步成为机器人工程师
+                    两个方向都有从入门、实战到比赛研发的完整培养阶段
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {trainingLevels.map((level, index) => (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {trainingTracks.map((track, trackIndex) => (
                     <motion.div
-                      key={level.level}
+                      key={track.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.8 + index * 0.15, duration: 0.5 }}
-                      className={`p-4 rounded-xl border ${level.color} backdrop-blur-sm`}
+                      transition={{ delay: 0.8 + trackIndex * 0.15, duration: 0.5 }}
+                      className={`p-5 rounded-2xl border ${track.borderColor} ${track.bgColor} backdrop-blur-sm`}
                     >
-                      <div className="text-xs font-mono text-rm-gray/50 mb-2">
-                        {level.level}
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl" aria-hidden="true">{track.icon}</span>
+                        <div>
+                          <h3 className={`text-base font-black ${track.color}`}>{track.name}</h3>
+                          <p className="text-[11px] text-rm-gray/50 uppercase tracking-wider">{track.nameEn}</p>
+                        </div>
                       </div>
-                      <h4 className="text-sm font-bold text-white mb-3">
-                        {level.title}
-                      </h4>
-                      <ul className="space-y-1.5">
-                        {level.items.map((item) => (
-                          <li
-                            key={item}
-                            className="text-xs text-rm-gray/70 flex items-start gap-1.5"
-                          >
-                            <span className="text-rm-gray/30 mt-0.5">·</span>
-                            {item}
-                          </li>
+
+                      <div className="space-y-3">
+                        {track.stages.map((stage, stageIndex) => (
+                          <div key={stage.level} className="flex gap-3 rounded-xl border border-white/[0.07] bg-black/20 p-3">
+                            <div className={`w-7 h-7 shrink-0 rounded-full border ${track.borderColor} flex items-center justify-center text-[11px] font-black ${track.color}`}>
+                              {stageIndex + 1}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                                <p className="text-xs font-bold text-white">{stage.title}</p>
+                                <p className="text-[10px] font-mono text-rm-gray/50">{stage.period}</p>
+                              </div>
+                              <p className="mt-1 text-[11px] leading-relaxed text-rm-gray/60">
+                                {stage.items.slice(0, 3).join(" · ")}
+                              </p>
+                            </div>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
